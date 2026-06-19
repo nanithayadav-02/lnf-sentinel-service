@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lnf-sentinel-service
+  namespace: lnf-develop
+  labels:
+    app: lnf-sentinel-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lnf-sentinel-service
+  template:
+    metadata:
+      labels:
+        app: lnf-sentinel-service
+    spec:
+      containers:
+        - name: lnf-sentinel-service
+          image: "docker.io/levernfulcrum/lnf-sentinel-service:latest"
+          imagePullPolicy: Always
+          env:
+            - name: KEYCLOAK_HOST
+              value: keycloak:8080
+            - name: DATABASE_HOST
+              value: lnf-develop-db-postgresql
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              value: "sentinel_db"
+            - name: DATABASE_USERNAME
+              value: "sentinel_user"
+            - name: SPRING_PROFILES_ACTIVE
+              value: dev
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: EMP_DATABASE_PASSWORD
+                  name: lnf-cred
+          ports:
+            - name: http
+              containerPort: 8081
+          readinessProbe:
+            tcpSocket:
+              port: 8081
