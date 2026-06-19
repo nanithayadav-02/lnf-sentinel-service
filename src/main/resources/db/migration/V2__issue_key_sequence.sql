@@ -1,0 +1,3 @@
+-- Sequential, human-readable issue keys: PRD-1001, PRD-1002, ...
+-- A dedicated sequence keeps key generation concurrency-safe.
+CREATE SEQUENCE issue_key_seq START WITH 1001 INCREMENT BY 1;

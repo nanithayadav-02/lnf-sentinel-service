@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Document</title>
+    <style>
+
+        /*
+         * Page geometry for Flying Saucer / openhtmltopdf.
+         * The renderer injects a per-page header band and a repeating footer
+         * (company address) into the page margins. Reserve enough top/bottom
+         * margin here so body content never flows underneath them.
+         *   top    -> clears the header band/logo
+         *   bottom -> clears the repeating "Lever & Fulcrum" footer block
+         */
+        @page {
+            size: A4;
+            margin: 32mm 18mm 30mm 18mm;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica", "Arial", sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1f1f1f;
+        }
+
+        /* Body copy: tight, predictable vertical rhythm (no engine defaults). */
+        p {
+            margin: 0 0 8px 0;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin: 0 0 8px 0;
+            padding-left: 22px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        table, td, th {
+            border: 0.5px solid gray;
+            border-collapse: collapse;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%; /* Adjust to fit within A4 page */
+        }
+
+        th {
+            height: 30px;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 5px;
+            font-weight: 550;
+            color: #3a3838;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* Keep the stamp + signatory lines together on one page. */
+        .sign-block {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-top: 6px;
+        }
+
+        /* Keep the declaration block intact. */
+        .declaration {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        /* Each annexure stays together on one page... */
+        .annexure {
+            page-break-before: always;
+            break-before: page;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        /*
+         * ...but Annexure I should fill the empty space left after the
+         * declaration instead of forcing a near-blank page before it.
+         * It still won't split (page-break-inside: avoid is inherited),
+         * so the salary table stays intact - it just starts on the
+         * current page when it fits, otherwise drops to the next page.
+         */
+        .annexure-first {
+            page-break-before: auto;
+            break-before: auto;
+            margin-top: 14px;
+        }
+
+        .annexure table {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+<p class="right ql-align-justify">
+    <strong>Date: <span th:text="${currentDate}"></span></strong>
+</p>
+<p class="right ql-align-justify"><strong>Ref: <span th:text="${employeeId}"></span></strong></p>
+<p class="right ql-align-justify"><br/></p>
+
+<p class="ql-align-justify"><strong><span th:text="${fullName}">Mr. Sample</span></strong></p>
+<p class="ql-align-justify" th:text="${addressLine1}">,</p>
+<p class="ql-align-justify">
+    <span th:text="${town}"></span>,
+    <span th:text="${city}"></span>,
+    <span th:text="${state}"></span>,
+    <span th:text="${postalCode}"></span>
+</p>
+<p class="ql-align-justify"><br/></p>
+
+<p class="ql-align-justify"><strong>Subject: Offer of Employment</strong></p>
+<p class="ql-align-justify">Dear <strong><span th:text="${fullName}"></span>,</strong></p>
+<p class="ql-align-justify">
+    This is with respect to your application and the subsequent rounds of discussions you had with us.
+    We are delighted to make you an offer as <strong>“<span class="text1" th:text="${designation}">LM</span>”</strong>
+    to join
+    <strong>Techno Facts Solutions Private Limited</strong> (here after referred to as “Company”), Hyderabad, India, as
+    per the below terms and conditions.</p>
+
+<!-- First-day reporting location (client work site). Rendered only when reporting details are supplied. -->
+<div th:if="${reportingCompany != null}">
+    <p class="ql-align-justify">On the First day of the employment, please report to:</p>
+    <p class="ql-align-justify"><strong><span th:text="${reportingCompany}">Realpage India Private Limited</span></strong></p>
+    <p class="ql-align-justify" th:utext="${reportingAddress}">5th Floor, building No 20,<br/>
+        Mind space Cyberabad, Survey No. 64 (Part),<br/>
+        Madhapur, Hyderabad, Telangana — 500081</p>
+</div>
+
+<p class="ql-align-justify">
+    Your joining date will be on <strong><span class="text1" th:text="${startDate}"></span></strong>. You will be paid
+    Gross Annual
+    Salary of <strong><span class="text1" th:text="${amount}">450000.0</span></strong>
+    (<span class="text1" th:text="${amountInWords}">Four Lakh Fifty Thousand Rupees Only</span>).</p>
+
+<p class="ql-align-justify">Please refer to</p>
+<ul>
+    <li class="ql-align-justify">Annexure I for the compensation details&nbsp;</li>
+    <li class="ql-align-justify">Annexure II for documentation to be submitted by you</li>
+    <li class="ql-align-justify">Terms and conditions of employment&nbsp;</li>
+</ul>
+
+<p class="ql-align-justify">We look forward to working with you.</p>
+<p class="ql-align-justify">Warm Regards,</p>
+
+<div class="sign-block" style="display: block;">
+    <img src="http://localhost:8088/api/v3/lnf/files/content?filePath=sample%2FToday%20TF%20%40Stamp%20work%20copy.jpg"
+         alt="Stamp"
+         style="width: 100px; height: 100px; object-fit: cover; flex-shrink: 0;" class="logo-image1"/>
+    <p><strong>Girish Babu P</strong></p>
+    <p><strong>Director</strong></p>
+    <p><strong>Techno Facts Solutions Private Limited</strong></p>
+</div>
+
+<p class="ql-align-justify"><br/></p>
+<p class="ql-align-justify"><br/></p>
+
+<p class="ql-align-justify"><strong>Here are the terms and conditions of our offer:</strong></p>
+
+<p class="ql-align-justify"><strong>Joining date:</strong></p>
+<p class="ql-align-justify">Your scheduled date of employment with us will be <strong><span class="text1"
+                                                                                            th:text="${startDate}"></span></strong>.
+</p>
+<p class="ql-align-justify">Once the joining date is expired, the provided offer letter is not valid.</p>
+
+<p class="ql-align-justify"><strong>Location:</strong></p>
+<p class="ql-align-justify">Your location for employment is <strong>Hyderabad, India</strong>. You may be asked to
+    relocate to any of our
+    units, departments or the offices of our affiliates and/or the offices of our customers, depending on business
+    requirements.</p>
+
+<p class="ql-align-justify"><strong>Probation and Confirmation:</strong></p>
+<p class="ql-align-justify">You will be on probation for a period of <strong>6 (Six)</strong> months from the date of
+    joining us. On successful
+    completion of your probation, you will be confirmed as a permanent employee of Techno Facts Solutions Pvt. Ltd.
+    If during, or on the expiry of, the probation period (initial or extended) the Management finds your performance
+    to be unsatisfactory or that you lack the aptitude for the job or that you are not suitable for the job, or the
+    like, your probationary employment would be liable to be terminated, at any time, without assigning any
+    reason.&nbsp;
+</p>
+
+<p class="ql-align-justify"><strong>Leave:</strong></p>
+<p class="ql-align-justify">After probation period, you are entitled 1 Casual/Sick leaves for each full month. Leave(s)
+    cannot be encashed but 6 leaves in the leave balance of the current financial year will be carry
+    forwarded to the next financial year. Leaves are not applicable during the time of notice period
+    and Probation.</p>
+
+<p class="ql-align-justify"><strong>Holiday:</strong></p>
+<p class="ql-align-justify">As each region may have different set of holidays, your holiday schedule will be governed
+    by
+    your office location.</p>
+
+<p class="ql-align-justify"><strong>Background check:</strong></p>
+<p class="ql-align-justify">The company reserves the right to verify the information furnished by you in your
+    application
+    for employment and through other documents. If it is found that you have misrepresented any
+    information on your application for employment or have furnished any false information or
+    have concealed / suppressed any relevant information, your services are liable to be terminated
+    any time, without any notice or compensation in lieu there of.</p>
+
+<p class="ql-align-justify"><strong>Medical Check:</strong></p>
+<p class="ql-align-justify">As per the company policy, employees are required to undergo medical check on request at
+    authorized medical centers and submit a duly certified copy of the medical certificate.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>Documents:</strong></p>
+<p class="ql-align-justify">You are required to provide copies of all mandatory documents required by the company or its
+    clients before joining and during the course of your employment.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>No show:</strong></p>
+<p class="ql-align-justify">Failure to report to the company on <strong><span class="text1"
+                                                                              th:text="${startDate}"></span></strong>
+    shall be deemed as “No Show” in such
+    event, the offer stands cancelled.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>Job responsibilities:</strong></p>
+<p class="ql-align-justify">You shall be responsible for the performance of the function expected of the same and any
+    additional functions and duties that may be assigned to you in connection with the business and operations of the
+    company.</p>
+<p class="ql-align-justify">You shall use the best of effort to promote, develop and extend the business of the company
+    and conform and comply with the directions and regulations of the company at all times, and in all
+    respects.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>Assignment:</strong></p>
+<p class="ql-align-justify">You shall acknowledge that the services to be render by you or unique and personal and
+    during your employment with company, you shall not assign any of the rights or delegate any of the duties or
+    obligations under this agreement without the prior written consent of the company.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>Deputation:</strong></p>
+<p class="ql-align-justify">During the period of fixed contract your services could be deputed at the sole discretion of
+    management to any of our client’s company to do work pertaining to or incidental to the client’s business.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>Reviews:</strong></p>
+<p class="ql-align-justify">Along with performance, your salary and other benefits will be reviewed from time to time at
+    the discretion of the company. Your increments in the grade will be subjected to and on the
+    basis of effective performance and results.</p>
+
+<p class="ql-align-justify"><strong>Final settlement:</strong></p>
+<p class="ql-align-justify">The final settlement for the relieved employee usually follows a cycle of
+    <strong>60</strong> working days from
+    the last working day. Unless you complete <strong>6 Months</strong> as an employee of Techno Facts Solution
+    Pvt. Ltd, final settlement won’t be released.</p>
+
+<p class="ql-align-justify"><strong>Indemnity:</strong></p>
+<p class="ql-align-justify">You shall keep the company indemnified for any damages, which company or clients may suffer
+    due to act/acts by you including breach of any terms of this agreement.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>UN-Authorized absence:</strong></p>
+<ul>
+    <li class="ql-align-justify">Any Absence for 3 consecutive business days without prior permission will be traded as
+        un-authorized absence from the work, in such case, the company is entitled to
+        terminate the employment and / or seek compensation for any loss suffered by the
+        company or its client due to such an absence.
+    </li>
+    <li class="ql-align-justify">Any unapproved leave taken is against the organization’s policy and 2 such leaves may
+        lead to Termination of the employment.
+    </li>
+</ul>
+
+<p class="ql-align-justify"><strong>Confidentiality and Non-disclosure:</strong></p>
+<p class="ql-align-justify">You hereby acknowledge that by reason of your services with the company, you will have
+    access to records, documents, drawings, formats, reports, studies, memoranda,
+    correspondence, manuals, plan, magnetic media and other information source (“Confidential
+    Material”) and such confidential material constitutes the property of the company, and/or its
+    clients, enables the company, and/or its clients to compete successfully in business and was</p>
+<p class="ql-align-justify">Acquired or created by the company and/or its clients at substantial expenses. In
+    consideration
+    to your services and the above disclosures, you agree that:
+    You will disclose to the company information, inventions, discoveries, products, systems, programs,
+    documentation including improvements or modifications (“Proprietary material”)
+    relating to the company and its clients whom you acquired or developed during the term of
+    your services with the company and such proprietary material is the sole property of the
+    company or its clients, regardless of whether or not its acquisition or development occurred
+    during work hours at the company facilities, or with the company property or personnel. You
+    will not disclose any such proprietary material to any unauthorized person during or after the
+    completion of services with the company.
+    You agree to comply with a supplementary agreement, when issued, between the company
+    and client regarding privacy and confidentiality. Such agreement will be incorporated into this</p>
+<p class="ql-align-justify">Agreement by reference, including improvements or modifications, “Proprietary Material”,
+    related to the company, and its clients whom you acquired or developed during the term of
+    employment with the company, and its clients are sole property of the company or its clients, regardless of
+    whether or not its acquisition or development occurred during work hours.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>Non-Compete and Non-Solicitation:</strong></p>
+<p class="ql-align-justify">You agree that during your services with the company and continuing for a period of 06
+    months after the termination of your services with the company, you&nbsp;</p>
+<ol type="a">
+    <li class="ql-align-justify">Will not individually or on behalf of or in conjunction with any other person or entity
+        (except on behalf of the company), directly or indirectly, solicit, sell to, or perform similar services as
+        provided by or available from the company, for any clients of the company.
+    </li>
+    <li class="ql-align-justify">Will not seek and obtain employment, training, or contract for employment or seek to
+        serves you or otherwise to clients of the company, customers, accounts or prospects, without the permission of
+        the company.
+    </li>
+    <li class="ql-align-justify">Will not directly or indirectly solicit or hire or cause others to solicit or hire any
+        other employee of the company.&nbsp;
+    </li>
+</ol>
+
+<p class="ql-align-justify"><strong>Waiver:</strong></p>
+<p class="ql-align-justify">A waiver by the company of a breach of any provision of this agreement by you shall not be
+    operated or be construed as a waiver or estoppel of any subsequent breach by you. No waiver shall be valid unless in
+    writing and signed by an authorized officer of the company.&nbsp;</p>
+
+<p class="ql-align-justify"><u><strong>MEDICAL BENEFITS:</strong></u> You are covered under Social Security as per the
+    law and Insurance policy
+    by the company. You may connect with HR for the Medical Insurance Policy for further details.&nbsp;</p>
+<p class="ql-align-justify"><u><strong>AGREEMENTS:</strong></u> You may be required to sign necessary agreements with
+    company or any other
+    client as required and complete formalities as per there requirements for new role and during
+    the tenure with company. You may also be required to sign other agreements with company, as the
+    company may decide from time to time, in order to secure the interests of company, as also to
+    ensure your performance and adherence too all terms, regulations, conditions and rules of the
+    company.&nbsp;</p>
+<p class="ql-align-justify"><u><strong>Other benefits:</strong></u> You shall be eligible for other benefits related to
+    leaves, prerequisites etc., in
+    accordance with the prevailing terms of employment in the company. Notwithstanding the
+    above, the company reserves the right to change any mentioned benefits as and when it
+    deemed necessary.&nbsp;</p>
+<p class="ql-align-justify"><u><strong>Increments and Promotion:</strong></u> Your growth in terms of role, compensation
+    and etc. in the
+    company will solely be based on your performance. Unless notified in writing, you will be
+    deemed as “Confirmed” on the completion of your probation period. i.e., 3 Months from the
+    date of joining. Subsequently, your annual performance appraisal and compensation review will
+    be aligned and effected from your subsequent quarter thereafter&nbsp;</p>
+<p class="ql-align-justify"><u><strong>Notice Period / Separation:</strong></u> Your employment with the company can
+    also be terminated either
+    by company or by giving you a fifteen (15 Days) notice in writing if the performance is not up to
+    the mark in the probation period. If the company terminates the employment and decides to
+    relive you before completion, the “Basic” component of salary for the balance shall be paid. If
+    at your request, the company agrees to relieve you before serving full Notice Period, you will
+    be liable to pay the same. “Buyout” option is not also available as per the company’s policy.
+    However, please note that accepting such early relieving request/ Buyout would entirely be at
+    the sole discretion of the company. In case of resignation, Your Salary will be kept on hold for
+    that month and shall be processed along with Full and Final Settlement post clearances from all
+    departments.&nbsp;</p>
+<p class="ql-align-justify">On termination of your employment for any reason, you shall comply with the company’s
+    Termination procedures, sign all required documents and return all company property. The
+    company will not be bound to pay any dues, till you have completed the separation procedures
+    as per the company.&nbsp;</p>
+
+<p class="ql-align-justify"><u><strong>JURISDICTION:</strong></u></p>
+<p class="ql-align-justify">In case any dispute arising out of the agreement. It shall be subject to the jurisdiction of
+    appropriate
+    court of Hyderabad, Telangana, India.&nbsp;</p>
+
+<p class="ql-align-justify"><strong>Termination by employer:</strong></p>
+<p class="ql-align-justify">The company may terminate the employment with or without cause under the following
+    conditions:</p>
+<p class="ql-align-justify"><u>With Cause:</u> The Company may, immediately and without notice, terminate the EMPLOYEE
+    from employment with “Cause”. The term “Cause” shall, as used in this Document, mean:
+    (1) The commission of crime involving moral turpitude, theft, fraud or
+    deceit; (2) conduct that has
+    adverse effect on the company’s reputation; (3) substantial or continued unwillingness or inability to
+    perform duties assigned to the EMPLOYEE; (4) Gross negligence or deliberate misconduct; (5) any
+    material breach of terms and condition specified in this letter; (6) Un-authorized absent from the
+    work for a period of three or more consecutive days without due consent or notifying your superior
+    officer; (7) If any declaration/document given or furnished by you to the Company proves to be false,
+    or if you are found to have willfully suppressed any material information; (8) If you have violated the
+    Company’s policies.</p>
+<p class="ql-align-justify"><u>Without Cause:</u> In the event that the employment is terminated without cause, the
+    EMPLOYER will provide 15 (Fifteen) days written notice prior to such termination. The Company may at its absolute
+    discretion make a payment representing salary (basic) in lieu of notice of termination.</p>
+
+<p class="ql-align-justify"><strong>Employee Exit – Resignation Clause:</strong></p>
+<p class="ql-align-justify">If you wish to leave the services of the company, a clear written notice of 60 (Sixty) days
+    has to be given to the company and need to complete the assigned work given by the project team. In case of failure
+    of such written notice within the prescribed time, you are bound to make good the loss suffered by the company and
+    other charges/liabilities company incurs consequent to the failure to give required written notice.</p>
+
+<p class="ql-align-justify"><br/></p>
+
+<div class="sign-block" style="display: block;">
+    <img src="http://localhost:8088/api/v3/lnf/files/content?filePath=sample%2FToday%20TF%20%40Stamp%20work%20copy.jpg"
+         alt="Stamp"
+         style="width: 100px; height: 100px; object-fit: cover; flex-shrink: 0;" class="logo-image1"/>
+    <p><strong>Girish Babu P</strong></p>
+    <p><strong>Director</strong></p>
+    <p><strong>Techno Facts Solutions Private Limited</strong></p>
+</div>
+
+<p class="ql-align-justify"><br/></p>
+
+<div class="declaration">
+    <p class="ql-align-justify"><strong>DECLARATION</strong></p>
+    <p class="ql-align-justify">I have read, understood and agree to the terms and conditions as set for this offer letter.&nbsp;</p>
+    <p class="ql-align-justify">Signature:</p>
+    <p class="ql-align-justify">Name:</p>
+    <p class="ql-align-justify">Date:</p>
+    <p class="ql-align-justify">Location:</p>
+</div>
+
+<div class="annexure annexure-first">
+    <h3 class="ql-align-center" style="display: block; text-align: center;"><strong>ANNEXURE I</strong></h3>
+    <p class="ql-align-justify"><strong>Name: <span th:text="${fullName}"></span></strong></p>
+    <p class="ql-align-justify"><strong>Designation: <span th:text="${designation}"></span></strong></p>
+    <p class="ql-align-justify"><strong>Please find the below details of your package and the associated break-up.</strong>&nbsp;
+    </p>
+    <table style="width:50%">
+        <tr style="height:20px">
+            <th>Salary Components</th>
+            <th>Annual (INR)</th>
+            <th>Monthly (INR)</th>
+        </tr>
+        <tr>
+            <th colspan="3" style="height:23px">PART A</th>
+        </tr>
+        <tr>
+            <td>Basic Salary</td>
+            <td th:text="${basicAnnually}">7,75,000.00</td>
+            <td th:text="${basicMonthly}">64,583.33</td>
+        </tr>
+        <tr>
+            <td>HRA</td>
+            <td th:text="${hraAnnually}">4,65,000.00</td>
+            <td th:text="${hraMonthly}">38,750.00</td>
+        </tr>
+        <tr>
+            <td>Conveyance Allowance</td>
+            <td th:text="${conveyanceAllowancesAnnually}">4,65,000.00</td>
+            <td th:text="${conveyanceAllowancesMonthly}">38,750.00</td>
+        </tr>
+        <tr>
+            <td>Medical Allowance</td>
+            <td th:text="${medicalAllowancesAnnually}">4,65,000.00</td>
+            <td th:text="${medicalAllowancesMonthly}">38,750.00</td>
+        </tr>
+        <tr>
+            <td>Special Allowance</td>
+            <td th:text="${specialAllowancesAnnually}">4,65,000.00</td>
+            <td th:text="${specialAllowancesMonthly}">38,750.00</td>
+        </tr>
+        <tr>
+            <td>GROSS SALARY</td>
+            <td th:text="${annuallyGrossSalary}">4,65,000.00</td>
+            <td th:text="${monthlyGrossSalary}">38,750.00</td>
+        </tr>
+        <tr>
+            <td>Net SALARY</td>
+            <td th:text="${annuallyNetSalary}">4,65,000.00</td>
+            <td th:text="${monthlyNetSalary}">38,750.00</td>
+        </tr>
+        <tr>
+            <th colspan="3" style="height:23px">PART B</th>
+        </tr>
+        <tr>
+            <td>Deductions</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>PF (Employee &amp; Employer)</td>
+            <td th:text="${providentFundAnnually}">4,65,000.00</td>
+            <td th:text="${providentFundMonthly}">38,750.00</td>
+        </tr>
+        <tr>
+            <td>Professional Tax</td>
+            <td th:text="${professionalTaxAnnually}">4,65,000.00</td>
+            <td th:text="${professionalTaxMonthly}">38,750.00</td>
+        </tr>
+        <tr>
+            <td>Health Insurance</td>
+            <td th:text="${medicalInsuranceAnnually}">NA</td>
+            <td th:text="${medicalInsuranceMonthly}">NA</td>
+        </tr>
+        <tr>
+            <td>Income Tax</td>
+            <td colspan="2">**As Applicable**</td>
+        </tr>
+        <tr>
+            <td style="height:16px"></td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td>Cost to Company (CTC)</td>
+            <td th:text="${ctc}" colspan="2">4,65,000.00</td>
+        </tr>
+    </table>
+
+    <p class="ql-align-justify"><strong>Note:</strong></p>
+    <p class="ql-align-justify">**Deductions will be made towards Income tax as per Government rules &amp;
+        regulations.</p>
+    <p class="ql-align-justify">** Group health insurance is only applicable to the company employee and will be
+        activated after 15 working days from date of joining.</p>
+
+    <p class="ql-align-justify"><br/></p>
+    <p class="ql-align-justify"><strong>Date:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Signature:&nbsp;</strong></p>
+</div>
+
+<div class="annexure">
+    <h3 class="ql-align-center" style="display: block; text-align: center;"><strong>ANNEXURE II</strong></h3>
+    <p class="ql-align-justify"><br/></p>
+    <p class="ql-align-justify">1. Two copies of your recent passport size photographs</p>
+    <p class="ql-align-justify">2. PAN card photocopy</p>
+    <p class="ql-align-justify">3. Signed hard copy of the Offer letter</p>
+    <p class="ql-align-justify">4. Documents/ containing Start date and end date of the last Two Employers</p>
+    <p class="ql-align-justify">5. Copy of PG/ Degree /Diploma certificates</p>
+    <p class="ql-align-justify">6. Copy of all semester mark sheets (last semester mandatory)</p>
+    <p class="ql-align-justify">7. Relieving letters from previous employer</p>
+    <p class="ql-align-justify">8. Experience certificate from 2 previous employers</p>
+    <p class="ql-align-justify">9. Passport / Aadhar Photocopy&nbsp;</p>
+</div>
+</body>
+</html>
