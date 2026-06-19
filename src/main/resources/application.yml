@@ -1,0 +1,308 @@
+spring:
+  profiles:
+    active: dev-ide
+
+  application:
+    name: lnf-sentinel-service
+
+  data:
+    redis:
+      host: ${REDIS_CACHE_HOST:localhost}
+      port: ${REDIS_CACHE_PORT:6379}
+    cache:
+      redis:
+        time-to-live: 3600000
+        cache-null-values: false
+        use-key-prefix: true
+      type: redis
+
+  flyway:
+    enabled: ${SPRING_FLYWAY_ENABLED:false}
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+server:
+  port: 8077
+  servlet:
+    context-path: /api/v3
+
+application:
+  maxInMemorySize: 10485760
+
+connection:
+  timeout: 30000
+
+audit:
+  service:
+    url: "http://localhost:8081/api/v3"
+
+lnf:
+  tenant:
+    enabled: ${TENANT_ENABLED:false}
+    databaseName: ${TENANT_DATABASE_NAME:sentinel}
+    auth:
+      base-url: ${LNF_TENANT_AUTH_BASE_URL:https://auth.leverandfulcrum.com}
+  entity-package: "com.lnf.sentinel.model"
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    enabled: ${EUREKA_ENABLED:false}
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULT_ZONE:http://localhost:8081/eureka/}
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+
+tracing:
+  url: ${TRACING_URL:http://localhost:4318/v1/traces}
+
+# Metrics sentinel
+management:
+  endpoint:
+    prometheus:
+      enabled: true
+  endpoints:
+    jmx:
+      exposure:
+        exclude: shutdown
+        include: "*"
+    web:
+      exposure:
+        exclude:
+        include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+logging:
+  level:
+    org:
+      springframework: INFO
+    root: ERROR
+  com.lnf.sentinel.*: DEBUG
+
+springdoc:
+  api-docs:
+    path: /lnf-sentinel
+  swagger-ui:
+    path: /lnf-sentinel-api.html
+    enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:sentinel_db
+    username: sentinel_user
+    password: sentinel@12345
+    driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: drop-and-create
+            scripts:
+              action: drop-and-create
+              create-target: schema.sql
+              drop-target: drop-schema.sql
+              create-source: metadata
+              drop-source: metadata
+              create-database-schemas: true
+    open-in-view: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}
+          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}/protocol/openid-connect/certs
+
+      client:
+        registration:
+          sentinel-service:
+            client-id: lnf-sentinel-api
+            client-secret: ${client-secret:lnf-sentinel-api-secret}
+            scope: openid,profile,roles
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}
+
+  sql.init.data-locations: classpath*:db/data.sql
+
+printStackTrace: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:sentinel_db}
+    username: ${database.username:sentinel_user}
+    password: ${database.password:sentinel@12345}
+    driverClassName: ${database.drive:org.postgresql.Driver}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:20}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:60000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              action: drop-and-create
+              create-database-schemas: false
+              create-target: schema.sql
+              create-source: metadata
+              drop-target: drop-schema.sql
+              drop-source: metadata
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}
+          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}/protocol/openid-connect/certs
+
+      client:
+        registration:
+          sentinel-service:
+            client-id: lnf-sentinel-api
+            client-secret: ${client-secret:lnf-sentinel-api-secret}
+            scope: openid,profile,roles
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}
+
+  sql.init.data-locations: classpath*:db/data.sql
+
+printStackTrace: true
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:sentinel_db}
+    username: ${database.username:sentinel_user}
+    password: ${database.password:sentinel@12345}
+    driverClassName: ${database.drive:org.postgresql.Driver}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:20}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:60000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              action: drop-and-create
+              create-database-schemas: false
+              create-target: schema.sql
+              create-source: metadata
+              drop-target: drop-schema.sql
+              drop-source: metadata
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}
+          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}/protocol/openid-connect/certs
+
+      client:
+        registration:
+          sentinel-service:
+            client-id: lnf-sentinel-api
+            client-secret: ${client-secret:lnf-sentinel-api-secret}
+            scope: openid,profile,roles
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}
+
+  sql.init.data-locations: classpath*:db/data.sql
+
+printStackTrace: true
+---
+spring:
+  config:
+    activate:
+      on-profile: dev-ide
+
+  datasource:
+    url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:sentinel_db}
+    username: ${database.username:sentinel_user}
+    password: ${database.password:sentinel@12345}
+    data: classpath*:db/data.sql
+    driverClassName: ${database.drive:org.postgresql.Driver}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:20}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:60000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              action: drop-and-create
+              create-database-schemas: false
+              create-target: schema.sql
+              create-source: metadata
+              drop-target: drop-schema.sql
+              drop-source: metadata
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  autoconfigure:
+    exclude:
+      - org.keycloak.adapters.springboot.KeycloakAutosentinel
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutosentinel
+  sql.init.data-locations: classpath*:db/data.sql
+
+printStackTrace: true
+---
