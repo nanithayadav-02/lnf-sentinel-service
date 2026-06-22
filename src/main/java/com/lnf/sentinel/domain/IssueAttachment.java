@@ -1,26 +1,24 @@
 package com.lnf.sentinel.domain;
 
+import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "issue_attachments")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class IssueAttachment {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class IssueAttachment extends AuditableEntity {
 
     @Column(name = "issue_id", nullable = false)
-    private Long issueId;
+    private UUID issueId;
 
     @Column(name = "file_name", nullable = false, length = 255)
     private String fileName;
@@ -37,7 +35,4 @@ public class IssueAttachment {
     @Column(name = "uploaded_by")
     private Long uploadedBy;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 }

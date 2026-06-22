@@ -1,29 +1,28 @@
 package com.lnf.sentinel.domain;
 
+import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "issue_comments")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class IssueComment {
+public class IssueComment extends AuditableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(name = "issue_id", nullable = false)
-    private Long issueId;
+    private UUID issueId;
 
     @Column(name = "author_id")
-    private Long authorId;
+    private UUID authorId;
 
     @Column(nullable = false, columnDefinition = "text")
     private String body;
@@ -31,8 +30,4 @@ public class IssueComment {
     /** TRUE = ops-only note (not tenant-visible). */
     @Column(nullable = false)
     private boolean internal = true;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 }

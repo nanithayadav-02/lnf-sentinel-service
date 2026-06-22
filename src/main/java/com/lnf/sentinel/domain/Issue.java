@@ -1,14 +1,14 @@
 package com.lnf.sentinel.domain;
 
+import com.lnf.model.AuditableEntity;
 import com.lnf.sentinel.domain.enums.*;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 /**
  * The core record: one production issue belonging to one tenant.
@@ -18,18 +18,16 @@ import java.time.OffsetDateTime;
 @Table(name = "issues")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
-public class Issue {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@AllArgsConstructor
+public class Issue extends AuditableEntity {
 
     @Column(name = "issue_key", nullable = false, unique = true, length = 20)
     private String issueKey;
 
     @Column(name = "tenant_id", nullable = false)
-    private Long tenantId;
+    private UUID tenantId;
 
     @Column(nullable = false, length = 240)
     private String title;
@@ -64,7 +62,7 @@ public class Issue {
     private Long reportedBy;
 
     @Column(name = "assignee_id")
-    private Long assigneeId;
+    private UUID assigneeId;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
@@ -84,14 +82,6 @@ public class Issue {
 
     @Column(name = "resolved_at")
     private OffsetDateTime resolvedAt;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 
     /** True when past SLA and not yet in a terminal state. */
     @Transient
