@@ -66,8 +66,8 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public Page<IssueDto> list(Long tenantId, IssueStatus status, Severity severity,
-                               Long assigneeId, String search, Pageable pageable) {
+    public Page<IssueDto> list(UUID tenantId, IssueStatus status, Severity severity,
+                               UUID assigneeId, String search, Pageable pageable) {
         Specification<Issue> spec = Specification
                 .where(tenantScope(tenantId))
                 .and(status(status))
@@ -118,7 +118,7 @@ public class IssueService {
 
         issue.setStatus(to);
         Issue saved = issueRepository.save(issue);
-        recordHistory(saved, from, to, req.changedBy(), req.note());
+        recordHistory(saved, from, to,null , null);
         return IssueConverter.toTransportModel(saved);
     }
 
@@ -139,8 +139,8 @@ public class IssueService {
     /**
      * A pinned tenant overrides any requested tenant filter; otherwise honour the filter.
      */
-    private Specification<Issue> tenantScope(Long requestedTenantId) {
-        Long effective = TenantContext.isSet() ? TenantContext.getTenantId() : (UUID) requestedTenantId;
+    private Specification<Issue> tenantScope(UUID requestedTenantId) {
+        UUID effective = TenantContext.isSet() ? TenantContext.getTenantId() : (UUID) requestedTenantId;
         return tenantId(effective);
     }
 
@@ -160,7 +160,7 @@ public class IssueService {
 
     private void recordHistory(Issue issue, IssueStatus from, IssueStatus to, Long changedBy, String note) {
         IssueStatusHistory h = new IssueStatusHistory();
-        h.setIssueId();
+        h.setIssueId(issue.getId());
         h.setFromStatus(from);
         h.setToStatus(to);
         h.setChangedBy(changedBy);
