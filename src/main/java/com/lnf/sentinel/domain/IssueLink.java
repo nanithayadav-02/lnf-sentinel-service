@@ -1,39 +1,30 @@
 package com.lnf.sentinel.domain;
 
+import com.lnf.model.AuditableEntity;
 import com.lnf.sentinel.domain.enums.LinkType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "issue_links")
 @Getter
 @Setter
 @NoArgsConstructor
-public class IssueLink {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class IssueLink extends AuditableEntity {
 
     @Column(name = "source_issue_id", nullable = false)
-    private Long sourceIssueId;
+    private UUID sourceIssueId;
 
     @Column(name = "target_issue_id", nullable = false)
-    private Long targetIssueId;
+    private UUID targetIssueId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "link_type", nullable = false, length = 20)
     private LinkType linkType;
 
-    @Column(name = "created_by")
-    private Long createdBy;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 }

@@ -24,5 +24,6 @@ public record LinkResponse(
                 : l.getLinkType().inverse();
         return new LinkResponse(l.getId(), l.getSourceIssueId(), l.getTargetIssueId(),
                 l.getLinkType(), direction, l.getCreatedBy(), l.getCreatedAt());
+
     }
 }
