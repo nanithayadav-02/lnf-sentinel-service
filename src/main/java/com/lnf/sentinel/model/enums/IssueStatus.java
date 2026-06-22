@@ -1,4 +1,4 @@
-package com.lnf.sentinel.domain.enums;
+package com.lnf.sentinel.model.enums;
 
 public enum IssueStatus {
     NEW, TRIAGED, IN_PROGRESS, AWAITING_TENANT, RESOLVED, CLOSED, REOPENED;

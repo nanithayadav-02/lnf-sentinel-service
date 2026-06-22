@@ -1,10 +1,11 @@
 package com.lnf.sentinel.repository;
 
-import com.lnf.sentinel.domain.IssueAttachment;
+import com.lnf.sentinel.model.IssueAttachment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface IssueAttachmentRepository extends JpaRepository<IssueAttachment, Long> {
-    List<IssueAttachment> findByIssueIdOrderByCreatedAtAsc(Long issueId);
+public interface IssueAttachmentRepository extends JpaRepository<IssueAttachment, UUID> {
+    List<IssueAttachment> findByIssueIdOrderByCreatedAtAsc(UUID issueId);
 }

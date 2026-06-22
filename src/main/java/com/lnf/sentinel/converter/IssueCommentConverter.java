@@ -1,14 +1,13 @@
 package com.lnf.sentinel.converter;
 
-import com.lnf.dto.sentinel.IssueAttachmentDto;
 import com.lnf.dto.sentinel.IssueCommentDto;
-import com.lnf.sentinel.domain.IssueComment;
+import com.lnf.sentinel.model.IssueComment;
 
 public class IssueCommentConverter {
 
     private IssueCommentConverter(){}
 
-    public IssueCommentDto toTransportModel(IssueComment entity){
+    public static IssueCommentDto toTransportModel(IssueComment entity){
         return IssueCommentDto.builder()
                 .issueId(entity.getIssueId())
                 .authorId(entity.getAuthorId())

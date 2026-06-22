@@ -2,8 +2,8 @@ package com.lnf.sentinel.converter;
 
 
 import com.lnf.dto.sentinel.IssueDto;
-import com.lnf.sentinel.domain.Issue;
-import com.lnf.sentinel.domain.enums.*;
+import com.lnf.sentinel.model.Issue;
+import com.lnf.sentinel.model.enums.*;
 
 public class IssueConverter {
 

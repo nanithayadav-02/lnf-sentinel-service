@@ -1,4 +1,4 @@
-package com.lnf.sentinel.domain;
+package com.lnf.sentinel.model;
 
 import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;

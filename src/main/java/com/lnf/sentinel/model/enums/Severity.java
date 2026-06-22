@@ -1,4 +1,4 @@
-package com.lnf.sentinel.domain.enums;
+package com.lnf.sentinel.model.enums;
 
 import java.time.Duration;
 

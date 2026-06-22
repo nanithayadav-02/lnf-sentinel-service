@@ -1,4 +1,4 @@
-package com.lnf.sentinel.domain.enums;
+package com.lnf.sentinel.model.enums;
 
 public enum LinkType {
     BLOCKS, BLOCKED_BY, DUPLICATES, RELATES_TO, CAUSED_BY;

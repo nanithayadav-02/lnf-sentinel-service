@@ -1,5 +1,7 @@
 package com.lnf.sentinel.tenant;
 
+import java.util.UUID;
+
 /**
  * Holds the tenant pinned to the current request thread.
  * <p>
@@ -12,16 +14,18 @@ package com.lnf.sentinel.tenant;
  */
 public final class TenantContext {
 
-    private static final ThreadLocal<Long> CURRENT = new ThreadLocal<>();
+    private static final ThreadLocal<UUID> CURRENT = new ThreadLocal<>();
 
     private TenantContext() {}
 
-    public static void setTenantId(Long tenantId) {
+    public static void setTenantId(UUID tenantId) {
         CURRENT.set(tenantId);
     }
 
-    /** @return the pinned tenant id, or {@code null} for cross-tenant (internal) access. */
-    public static Long getTenantId() {
+    /**
+     * @return the pinned tenant id, or {@code null} for cross-tenant (internal) access.
+     */
+    public static UUID getTenantId() {
         return CURRENT.get();
     }
 

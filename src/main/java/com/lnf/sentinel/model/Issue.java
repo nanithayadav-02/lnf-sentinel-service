@@ -1,11 +1,9 @@
-package com.lnf.sentinel.domain;
+package com.lnf.sentinel.model;
 
 import com.lnf.model.AuditableEntity;
-import com.lnf.sentinel.domain.enums.*;
+import com.lnf.sentinel.model.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

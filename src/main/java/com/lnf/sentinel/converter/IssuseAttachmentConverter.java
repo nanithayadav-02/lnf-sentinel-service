@@ -1,7 +1,7 @@
 package com.lnf.sentinel.converter;
 
 import com.lnf.dto.sentinel.IssueAttachmentDto;
-import com.lnf.sentinel.domain.IssueAttachment;
+import com.lnf.sentinel.model.IssueAttachment;
 
 public class IssuseAttachmentConverter {
 
