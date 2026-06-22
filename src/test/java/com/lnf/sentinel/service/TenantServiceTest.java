@@ -2,8 +2,8 @@ package com.lnf.sentinel.service;
 
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.sentinel.AbstractIntegrationTest;
-import com.lnf.sentinel.domain.enums.SupportTier;
-import com.lnf.sentinel.domain.enums.TenantStatus;
+import com.lnf.sentinel.model.enums.SupportTier;
+import com.lnf.sentinel.model.enums.TenantStatus;
 import com.lnf.sentinel.dto.CreateTenantRequest;
 import com.lnf.sentinel.dto.TenantResponse;
 import org.junit.jupiter.api.Test;

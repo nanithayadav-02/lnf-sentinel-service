@@ -1,6 +1,6 @@
-package com.lnf.sentinel.domain;
+package com.lnf.sentinel.model;
 
-import com.lnf.sentinel.domain.enums.Severity;
+import com.lnf.sentinel.model.enums.Severity;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;

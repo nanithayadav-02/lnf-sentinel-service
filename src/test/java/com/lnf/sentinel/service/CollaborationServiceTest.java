@@ -2,8 +2,7 @@ package com.lnf.sentinel.service;
 
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.sentinel.AbstractIntegrationTest;
-import com.lnf.sentinel.domain.enums.*;
-import com.lnf.sentinel.dto.*;
+import com.lnf.sentinel.model.enums.*;
 import com.lnf.sentinel.tenant.TenantContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

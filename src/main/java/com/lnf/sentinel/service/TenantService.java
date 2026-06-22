@@ -2,18 +2,16 @@ package com.lnf.sentinel.service;
 
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
-import com.lnf.sentinel.domain.Tenant;
-import com.lnf.sentinel.domain.enums.SupportTier;
-import com.lnf.sentinel.domain.enums.TenantStatus;
-import com.lnf.sentinel.dto.CreateTenantRequest;
-import com.lnf.sentinel.dto.TenantResponse;
+import com.lnf.sentinel.model.Tenant;
+import com.lnf.sentinel.model.enums.SupportTier;
+import com.lnf.sentinel.model.enums.TenantStatus;
 import com.lnf.sentinel.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
+/*
 @Service
 @RequiredArgsConstructor
 public class TenantService {
@@ -49,3 +47,4 @@ public class TenantService {
                 .orElseThrow(() -> new LnFEntityNotFoundException("Tenant not found: " + id));
     }
 }
+*/

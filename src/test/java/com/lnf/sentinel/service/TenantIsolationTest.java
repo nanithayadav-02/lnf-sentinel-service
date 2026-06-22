@@ -2,10 +2,10 @@ package com.lnf.sentinel.service;
 
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.sentinel.AbstractIntegrationTest;
-import com.lnf.sentinel.domain.enums.Category;
-import com.lnf.sentinel.domain.enums.Environment;
-import com.lnf.sentinel.domain.enums.Priority;
-import com.lnf.sentinel.domain.enums.Severity;
+import com.lnf.sentinel.model.enums.Category;
+import com.lnf.sentinel.model.enums.Environment;
+import com.lnf.sentinel.model.enums.Priority;
+import com.lnf.sentinel.model.enums.Severity;
 import com.lnf.sentinel.dto.CreateIssueRequest;
 import com.lnf.sentinel.dto.IssueResponse;
 import com.lnf.sentinel.dto.UpdateIssueRequest;

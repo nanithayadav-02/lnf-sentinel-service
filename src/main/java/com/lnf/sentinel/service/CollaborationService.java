@@ -1,9 +1,12 @@
 package com.lnf.sentinel.service;
 
+import com.lnf.dto.sentinel.IssueAttachmentDto;
+import com.lnf.dto.sentinel.IssueCommentDto;
+import com.lnf.dto.sentinel.IssueLinkDto;
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
-import com.lnf.sentinel.domain.*;
-import com.lnf.sentinel.dto.*;
+import com.lnf.sentinel.converter.IssueCommentConverter;
+import com.lnf.sentinel.model.*;
 import com.lnf.sentinel.repository.*;
 import com.lnf.sentinel.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Comments, cross-issue links, watchers and attachments. All tenant-scoped.
@@ -28,22 +32,22 @@ public class CollaborationService {
 
     // ---- comments ---------------------------------------------------------
 
-    @Transactional
-    public CommentResponse addComment(Long issueId, CreateCommentRequest req) {
+    public IssueCommentDto  addComment(UUID issueId, IssueCommentDto req) {
         requireIssue(issueId);
-        IssueComment c = new IssueComment();
-        c.setIssueId(issueId);
-        c.setAuthorId(req.authorId());
-        c.setBody(req.body());
-        c.setInternal(req.internal() == null || req.internal());
-        return CommentResponse.from(commentRepository.save(c));
+        IssueComment comment = new IssueComment();
+        comment.setIssueId(issueId);
+        comment.setAuthorId(req.getAuthorId());
+        comment.setBody(req.getBody());
+        comment.setInternal(req.isInternal());
+        commentRepository.save(comment);
+        return IssueCommentConverter.toTransportModel(comment);
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponse> listComments(Long issueId) {
+    public List<IssueCommentDto> listComments(UUID issueId) {
         requireIssue(issueId);
         return commentRepository.findByIssueIdOrderByCreatedAtAsc(issueId)
-                .stream().map(CommentResponse::from).toList();
+                .stream().map(IssueCommentConverter::toTransportModel).toList();
     }
 
     // ---- links ------------------------------------------------------------
@@ -69,16 +73,16 @@ public class CollaborationService {
     }
 
     @Transactional(readOnly = true)
-    public List<LinkResponse> listLinks(Long issueId) {
+    public List<IssueLinkDto> listLinks(UUID issueId) {
         requireIssue(issueId);
-        List<LinkResponse> out = new ArrayList<>();
+        List<IssueLinkDto> out = new ArrayList<>();
         linkRepository.findBySourceIssueId(issueId).forEach(l -> out.add(LinkResponse.from(l, issueId)));
         linkRepository.findByTargetIssueId(issueId).forEach(l -> out.add(LinkResponse.from(l, issueId)));
         return out;
     }
 
     @Transactional
-    public void deleteLink(Long linkId) {
+    public void deleteLink(UUID linkId) {
         IssueLink link = linkRepository.findById(linkId)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Link not found: " + linkId));
         // Tenant-scope: the source issue must be visible to the caller.
@@ -102,14 +106,14 @@ public class CollaborationService {
     }
 
     @Transactional
-    public void removeWatcher(Long issueId, Long userId) {
+    public void removeWatcher(UUID issueId, UUID userId) {
         requireIssue(issueId);
         watcherRepository.findByIssueIdAndUserId(issueId, userId)
                 .ifPresent(watcherRepository::delete);
     }
 
     @Transactional(readOnly = true)
-    public List<WatcherResponse> listWatchers(Long issueId) {
+    public List<Wat> listWatchers(UUID issueId) {
         requireIssue(issueId);
         return watcherRepository.findByIssueId(issueId)
                 .stream().map(WatcherResponse::from).toList();
@@ -118,23 +122,24 @@ public class CollaborationService {
     // ---- attachments ------------------------------------------------------
 
     @Transactional
-    public AttachmentResponse addAttachment(Long issueId, CreateAttachmentRequest req) {
+    public IssueAttachmentDto addAttachment(UUID issueId, IssueAttachmentDto req) {
         requireIssue(issueId);
-        IssueAttachment a = new IssueAttachment();
-        a.setIssueId(issueId);
-        a.setFileName(req.fileName());
-        a.setStorageKey(req.storageKey());
-        a.setContentType(req.contentType());
-        a.setSizeBytes(req.sizeBytes());
-        a.setUploadedBy(req.uploadedBy());
-        return AttachmentResponse.from(attachmentRepository.save(a));
+        IssueAttachment attachment = new IssueAttachment();
+        attachment.setIssueId(req.getIssueId());
+        attachment.setFileName(req.getFileName());
+        attachment.setStorageKey(req.getStorageKey());
+        attachment.setContentType(req.getContentType());
+        attachment.setSizeBytes(req.getSizeBytes());
+        attachment.setUploadedBy(req.getUploadedBy());
+        attachmentRepository.save(attachment);
+        return IssueCommentConverter.toTransportModel(attachment);
     }
 
     @Transactional(readOnly = true)
-    public List<AttachmentResponse> listAttachments(Long issueId) {
+    public List<IssueAttachmentDto> listAttachments(UUID issueId) {
         requireIssue(issueId);
         return attachmentRepository.findByIssueIdOrderByCreatedAtAsc(issueId)
-                .stream().map(AttachmentResponse::from).toList();
+                .stream().map(IssueAttachment::getContentType).toList();
     }
 
     // ---- helper -----------------------------------------------------------
@@ -142,7 +147,7 @@ public class CollaborationService {
     /**
      * Load an issue scoped to the pinned tenant; 404 (never leak) on cross-tenant access.
      */
-    private Issue requireIssue(Long issueId) {
+    private Issue requireIssue(UUID issueId) {
         if (TenantContext.isSet()) {
             return issueRepository.findByIdAndTenantId(issueId, TenantContext.getTenantId())
                     .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + issueId));

@@ -1,9 +1,8 @@
 package com.lnf.sentinel.service;
 
-import com.lnf.sentinel.domain.Issue;
-import com.lnf.sentinel.domain.enums.IssueStatus;
-import com.lnf.sentinel.domain.enums.Severity;
-import com.lnf.sentinel.dto.MetricsSummaryResponse;
+import com.lnf.sentinel.model.Issue;
+import com.lnf.sentinel.model.enums.IssueStatus;
+import com.lnf.sentinel.model.enums.Severity;
 import com.lnf.sentinel.repository.IssueRepository;
 import com.lnf.sentinel.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;

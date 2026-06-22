@@ -1,8 +1,8 @@
 package com.lnf.sentinel.controller;
 
-import com.lnf.sentinel.domain.enums.IssueStatus;
-import com.lnf.sentinel.domain.enums.Severity;
-import com.lnf.sentinel.dto.*;
+import com.lnf.dto.sentinel.*;
+import com.lnf.sentinel.model.enums.IssueStatus;
+import com.lnf.sentinel.model.enums.Severity;
 import com.lnf.sentinel.service.CollaborationService;
 import com.lnf.sentinel.service.IssueService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/issues")
@@ -28,7 +29,7 @@ public class IssueController {
 
     @GetMapping
     @Operation(summary = "List issues (filterable, paginated)")
-    public Page<IssueResponse> list(
+    public Page<IssueDto> list(
             @RequestParam(required = false) Long tenantId,
             @RequestParam(required = false) IssueStatus status,
             @RequestParam(required = false) Severity severity,
@@ -40,67 +41,67 @@ public class IssueController {
 
     @PostMapping
     @Operation(summary = "Create an issue (generates key, sets SLA, writes initial history)")
-    public ResponseEntity<IssueResponse> create(@Valid @RequestBody CreateIssueRequest req) {
+    public ResponseEntity<IssueDto> create(@Valid @RequestBody IssueDto req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(issueService.create(req));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get one issue (tenant-scoped)")
-    public IssueResponse get(@PathVariable Long id) {
+    public IssueDto get(@PathVariable Long id) {
         return issueService.get(id);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update mutable fields")
-    public IssueResponse update(@PathVariable Long id, @Valid @RequestBody UpdateIssueRequest req) {
+    public IssueDto update(@PathVariable Long id, @Valid @RequestBody IssueDto req) {
         return issueService.update(id, req);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Change status (+ resolution/root cause on resolve/close)")
-    public IssueResponse changeStatus(@PathVariable Long id, @Valid @RequestBody ChangeStatusRequest req) {
+    public IssueDto changeStatus(@PathVariable Long id, @Valid @RequestBody IssueDto req) {
         return issueService.changeStatus(id, req);
     }
 
     // ---- comments ----
     @GetMapping("/{id}/comments")
-    public List<CommentResponse> listComments(@PathVariable Long id) {
+    public List<IssueCommentDto> listComments(@PathVariable UUID id) {
         return collaborationService.listComments(id);
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<CommentResponse> addComment(@PathVariable Long id,
-                                                      @Valid @RequestBody CreateCommentRequest req) {
+    public ResponseEntity<IssueCommentDto> addComment(@PathVariable UUID id,
+                                                      @Valid @RequestBody IssueCommentDto req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.addComment(id, req));
     }
 
     // ---- links ----
     @GetMapping("/{id}/links")
-    public List<LinkResponse> listLinks(@PathVariable Long id) {
+    public List<IssueLinkDto> listLinks(@PathVariable UUID id) {
         return collaborationService.listLinks(id);
     }
 
     @PostMapping("/{id}/links")
-    public ResponseEntity<LinkResponse> createLink(@PathVariable Long id,
-                                                   @Valid @RequestBody CreateLinkRequest req) {
+    public ResponseEntity<IssueLinkDto> createLink(@PathVariable Long id,
+                                                   @Valid @RequestBody IssueLinkDto req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.createLink(id, req));
     }
 
     @DeleteMapping("/links/{linkId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteLink(@PathVariable Long linkId) {
+    public void deleteLink(@PathVariable UUID linkId) {
         collaborationService.deleteLink(linkId);
     }
 
     // ---- watchers ----
     @GetMapping("/{id}/watchers")
-    public List<WatcherResponse> listWatchers(@PathVariable Long id) {
+    public List<IssueWatcherDto> listWatchers(@PathVariable UUID id) {
         return collaborationService.listWatchers(id);
     }
 
     @PostMapping("/{id}/watchers/{userId}")
     @Operation(summary = "Watch an issue (idempotent)")
-    public WatcherResponse addWatcher(@PathVariable Long id, @PathVariable Long userId) {
+    public IssueWatcherDto addWatcher(@PathVariable Long id, @PathVariable Long userId) {
         return collaborationService.addWatcher(id, userId);
     }
 
@@ -113,14 +114,14 @@ public class IssueController {
 
     // ---- attachments ----
     @GetMapping("/{id}/attachments")
-    public List<AttachmentResponse> listAttachments(@PathVariable Long id) {
+    public List<IssueAttachmentDto> listAttachments(@PathVariable Long id) {
         return collaborationService.listAttachments(id);
     }
 
     @PostMapping("/{id}/attachments")
     @Operation(summary = "Upload attachment metadata (binary lives in blob storage)")
-    public ResponseEntity<AttachmentResponse> addAttachment(@PathVariable Long id,
-                                                            @Valid @RequestBody CreateAttachmentRequest req) {
+    public ResponseEntity<IssueAttachmentDto> addAttachment(@PathVariable Long id,
+                                                            @Valid @RequestBody IssueAttachmentDto req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.addAttachment(id, req));
     }
 }

@@ -1,7 +1,7 @@
 package com.lnf.sentinel.service;
 
 import com.lnf.sentinel.AbstractIntegrationTest;
-import com.lnf.sentinel.domain.enums.*;
+import com.lnf.sentinel.model.enums.*;
 import com.lnf.sentinel.dto.ChangeStatusRequest;
 import com.lnf.sentinel.dto.CreateIssueRequest;
 import com.lnf.sentinel.dto.MetricsSummaryResponse;

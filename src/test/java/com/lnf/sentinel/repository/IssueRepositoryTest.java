@@ -1,9 +1,9 @@
 package com.lnf.sentinel.repository;
 
 import com.lnf.sentinel.AbstractIntegrationTest;
-import com.lnf.sentinel.domain.Issue;
-import com.lnf.sentinel.domain.enums.IssueStatus;
-import com.lnf.sentinel.domain.enums.Severity;
+import com.lnf.sentinel.model.Issue;
+import com.lnf.sentinel.model.enums.IssueStatus;
+import com.lnf.sentinel.model.enums.Severity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
