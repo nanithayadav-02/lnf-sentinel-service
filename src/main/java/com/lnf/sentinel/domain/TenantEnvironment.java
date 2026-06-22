@@ -1,5 +1,6 @@
 package com.lnf.sentinel.domain;
 
+import com.lnf.model.AuditableEntity;
 import com.lnf.sentinel.domain.enums.Environment;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,11 +16,9 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TenantEnvironment {
+public class TenantEnvironment  extends AuditableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
 
     @Column(name = "tenant_id", nullable = false)
     private Long tenantId;
@@ -37,11 +36,5 @@ public class TenantEnvironment {
     @Column(length = 40)
     private String region;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

@@ -1,5 +1,6 @@
 package com.lnf.sentinel.domain;
 
+import com.lnf.model.AuditableEntity;
 import com.lnf.sentinel.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,11 +16,9 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class User  extends AuditableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
 
     @Column(nullable = false, unique = true, length = 160)
     private String email;
@@ -38,11 +37,5 @@ public class User {
     @Column(nullable = false)
     private boolean active = true;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

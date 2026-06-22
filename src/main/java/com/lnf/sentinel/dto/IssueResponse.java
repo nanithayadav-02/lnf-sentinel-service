@@ -27,9 +27,9 @@ public record IssueResponse(
         OffsetDateTime resolvedAt,
         boolean slaBreached,
         OffsetDateTime createdAt,
+
         OffsetDateTime updatedAt
-) {
-    public static IssueResponse from(Issue i) {
+) {public static IssueResponse from(Issue i) {
         return new IssueResponse(
                 i.getId(), i.getIssueKey(), i.getTenantId(), i.getTitle(), i.getDescription(),
                 i.getSeverity(), i.getPriority(), i.getStatus(), i.getCategory(), i.getEnvironment(),
