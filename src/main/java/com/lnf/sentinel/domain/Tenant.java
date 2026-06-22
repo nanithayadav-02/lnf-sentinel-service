@@ -19,8 +19,6 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class Tenant  extends AuditableEntity {
 
-
-
     @Column(name = "tenant_code", nullable = false, unique = true, length = 40)
     private String tenantCode;
 
@@ -46,6 +44,5 @@ public class Tenant  extends AuditableEntity {
 
     @Column(name = "primary_contact_email", length = 160)
     private String primaryContactEmail;
-
 
 }

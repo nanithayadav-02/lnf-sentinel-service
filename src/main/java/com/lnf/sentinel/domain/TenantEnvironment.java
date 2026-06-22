@@ -6,10 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "tenant_environments")
@@ -17,8 +13,6 @@ import java.time.OffsetDateTime;
 @Setter
 @NoArgsConstructor
 public class TenantEnvironment  extends AuditableEntity {
-
-
 
     @Column(name = "tenant_id", nullable = false)
     private Long tenantId;
@@ -35,6 +29,5 @@ public class TenantEnvironment  extends AuditableEntity {
 
     @Column(length = 40)
     private String region;
-
 
 }

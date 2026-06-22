@@ -6,10 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "users")
@@ -17,8 +13,6 @@ import java.time.OffsetDateTime;
 @Setter
 @NoArgsConstructor
 public class User  extends AuditableEntity {
-
-
 
     @Column(nullable = false, unique = true, length = 160)
     private String email;
@@ -36,6 +30,5 @@ public class User  extends AuditableEntity {
 
     @Column(nullable = false)
     private boolean active = true;
-
 
 }
