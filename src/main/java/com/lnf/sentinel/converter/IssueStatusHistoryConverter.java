@@ -1,7 +1,7 @@
 package com.lnf.sentinel.converter;
 
 import com.lnf.dto.sentinel.IssueStatusHistoryDto;
-import com.lnf.sentinel.domain.IssueStatusHistory;
+import com.lnf.sentinel.model.IssueStatusHistory;
 
 public final class IssueStatusHistoryConverter {
 
@@ -20,8 +20,17 @@ public final class IssueStatusHistoryConverter {
         dto.setIssueId(entity.getIssueId());
         dto.setChangedBy(entity.getChangedBy());
         dto.setNote(entity.getNote());
-        dto.setFromStatus(entity.getFromStatus());
-        dto.setToStatus(entity.getToStatus());
+        dto.setFromStatus(
+                entity.getFromStatus() != null
+                        ? entity.getFromStatus().name()
+                        : null
+        );
+
+        dto.setToStatus(
+                entity.getToStatus() != null
+                        ? entity.getToStatus().name()
+                        : null
+        );
 
         return dto;
     }
@@ -39,8 +48,17 @@ public final class IssueStatusHistoryConverter {
         entity.setIssueId(dto.getIssueId());
         entity.setChangedBy(dto.getChangedBy());
         entity.setNote(dto.getNote());
-        entity.setFromStatus(dto.getFromStatus());
-        entity.setToStatus(dto.getToStatus());
+        dto.setFromStatus(
+                entity.getFromStatus() != null
+                        ? entity.getFromStatus().name()
+                        : null
+        );
+
+        dto.setToStatus(
+                entity.getToStatus() != null
+                        ? entity.getToStatus().name()
+                        : null
+        );
 
         return entity;
     }

@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "issue_status_history")
@@ -21,7 +22,7 @@ public class IssueStatusHistory {
     private Long id;
 
     @Column(name = "issue_id", nullable = false)
-    private Long issueId;
+    private UUID issueId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "from_status", length = 20)
@@ -37,7 +38,5 @@ public class IssueStatusHistory {
     @Column(length = 500)
     private String note;
 
-    @CreationTimestamp
-    @Column(name = "changed_at", nullable = false, updatable = false)
-    private OffsetDateTime changedAt;
+
 }

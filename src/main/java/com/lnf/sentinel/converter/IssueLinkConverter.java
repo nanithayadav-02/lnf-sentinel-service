@@ -1,8 +1,8 @@
 package com.lnf.sentinel.converter;
 
 import com.lnf.dto.sentinel.IssueLinkDto;
-import com.lnf.sentinel.domain.IssueLink;
-import com.lnf.sentinel.domain.enums.LinkType;
+import com.lnf.sentinel.model.IssueLink;
+import com.lnf.sentinel.model. enums.LinkType;
 
 public final class IssueLinkConverter {
 
@@ -17,7 +17,7 @@ public final class IssueLinkConverter {
 
         IssueLinkDto dto = new IssueLinkDto();
 
-        dto.setId(entity.getId());
+        //dto.setId(entity.getI);
         dto.setSourceIssueId(entity.getSourceIssueId());
         dto.setTargetIssueId(entity.getTargetIssueId());
 

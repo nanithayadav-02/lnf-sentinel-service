@@ -2,8 +2,8 @@ package com.lnf.sentinel.converter;
 
 import com.lnf.dto.sentinel.IssueStatusHistoryDto;
 import com.lnf.dto.sentinel.IssueWatcherDto;
-import com.lnf.sentinel.domain.IssueStatusHistory;
-import com.lnf.sentinel.domain.IssueWatcher;
+import com.lnf.sentinel.model.IssueStatusHistory;
+import com.lnf.sentinel.model.IssueWatcher;
 
 public final class IssueWatcherConverter {
     private  IssueWatcherConverter(){
