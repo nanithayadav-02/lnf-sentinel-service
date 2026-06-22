@@ -10,6 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -33,7 +35,7 @@ public class User {
 
     /** NULL = internal staff (cross-tenant). */
     @Column(name = "tenant_id")
-    private Long tenantId;
+    private UUID tenantId;
 
     @Column(nullable = false)
     private boolean active = true;

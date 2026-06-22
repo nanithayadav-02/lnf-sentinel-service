@@ -48,11 +48,7 @@ public class TenantEnvironmentConverter {
         }
 
 
-        entity.setTenantId(
-                dto.getTenantId() != null
-                        ? dto.getTenantId().getMostSignificantBits()
-                        : null
-        );
+        entity.setTenantId(dto.getTenantId());
 
         entity.setEnvironment(
                 dto.getEnvironment() != null

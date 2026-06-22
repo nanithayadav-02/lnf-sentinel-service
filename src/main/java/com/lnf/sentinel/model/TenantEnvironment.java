@@ -10,6 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "tenant_environments")
 @Getter
@@ -22,7 +24,7 @@ public class TenantEnvironment {
     private Long id;
 
     @Column(name = "tenant_id", nullable = false)
-    private Long tenantId;
+    private UUID tenantId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
