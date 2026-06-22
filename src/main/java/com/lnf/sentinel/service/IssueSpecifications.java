@@ -9,13 +9,14 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /** Composable JPA Specifications used to filter issues. */
 public final class IssueSpecifications {
 
     private IssueSpecifications() {}
 
-    public static Specification<Issue> tenantId(Long tenantId) {
+    public static Specification<Issue> tenantId(UUID tenantId) {
         return (root, query, cb) ->
                 tenantId == null ? cb.conjunction() : cb.equal(root.get("tenantId"), tenantId);
     }
@@ -30,7 +31,7 @@ public final class IssueSpecifications {
                 severity == null ? cb.conjunction() : cb.equal(root.get("severity"), severity);
     }
 
-    public static Specification<Issue> assigneeId(Long assigneeId) {
+    public static Specification<Issue> assigneeId(UUID assigneeId) {
         return (root, query, cb) ->
                 assigneeId == null ? cb.conjunction() : cb.equal(root.get("assigneeId"), assigneeId);
     }
