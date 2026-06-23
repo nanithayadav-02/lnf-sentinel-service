@@ -20,13 +20,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class User extends AuditableEntity {
 
-<<<<<<< HEAD
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
-=======
->>>>>>> c349a78efc589e05e7eb1669f6b55d2017282f40
-
     @Column(nullable = false, unique = true, length = 160)
     private String email;
 
@@ -44,11 +37,4 @@ public class User extends AuditableEntity {
     @Column(nullable = false)
     private boolean active = true;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

@@ -19,9 +19,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class TenantEnvironment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
@@ -39,11 +36,4 @@ public class TenantEnvironment {
     @Column(length = 40)
     private String region;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

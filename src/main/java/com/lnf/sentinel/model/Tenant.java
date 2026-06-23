@@ -16,10 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Tenant {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
-
     @Column(name = "tenant_code", nullable = false, unique = true, length = 40)
     private String tenantCode;
 
