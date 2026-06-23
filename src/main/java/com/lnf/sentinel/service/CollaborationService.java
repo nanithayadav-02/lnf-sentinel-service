@@ -51,7 +51,7 @@ public class CollaborationService {
     @Transactional(readOnly = true)
     public List<IssueCommentDto> listComments(UUID issueId) {
         requireIssue(issueId);
-        return commentRepository.findByIssueIdOrderByCreatedAtAsc(issueId)
+        return commentRepository.findByIssueId(issueId)
                 .stream().map(IssueCommentConverter::toTransportModel).toList();
     }
 
@@ -145,7 +145,7 @@ public class CollaborationService {
     @Transactional(readOnly = true)
     public List<IssueAttachmentDto> listAttachments(UUID issueId) {
         requireIssue(issueId);
-        return attachmentRepository.findByIssueIdOrderByCreatedAtAsc(issueId)
+        return attachmentRepository.findByIssueId(issueId)
                 .stream().map(IssueAttachmentConverter::toTransportModel).toList();
     }
 

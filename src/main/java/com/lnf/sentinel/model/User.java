@@ -1,5 +1,6 @@
 package com.lnf.sentinel.model;
 
+import com.lnf.model.AuditableEntity;
 import com.lnf.sentinel.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,11 +18,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+public class User extends AuditableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(nullable = false, unique = true, length = 160)
     private String email;

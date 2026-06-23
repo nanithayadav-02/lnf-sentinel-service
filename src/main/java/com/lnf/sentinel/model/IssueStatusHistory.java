@@ -1,5 +1,6 @@
 package com.lnf.sentinel.model;
 
+import com.lnf.model.AuditableEntity;
 import com.lnf.sentinel.model.enums.IssueStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,11 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IssueStatusHistory {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class IssueStatusHistory extends AuditableEntity {
 
     @Column(name = "issue_id", nullable = false)
     private UUID issueId;

@@ -33,7 +33,6 @@ public class IssueService {
     private final IssueRepository issueRepository;
     private final IssueStatusHistoryRepository historyRepository;
     private final TenantRepository tenantRepository;
-    private final TenantContext tenantContext;
 
     @Transactional
     public IssueDto create(IssueDto req) {

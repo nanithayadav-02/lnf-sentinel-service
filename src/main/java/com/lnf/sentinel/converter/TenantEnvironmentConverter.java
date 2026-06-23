@@ -3,8 +3,8 @@ package com.lnf.sentinel.converter;
 
 
 import com.lnf.dto.sentinel.TenantEnvironmentDto;
-import com.lnf.sentinel.domain.TenantEnvironment;
-import com.lnf.sentinel.domain.enums.Environment;
+import com.lnf.sentinel.model.TenantEnvironment;
+import com.lnf.sentinel.model.enums.Environment;
 
 public class TenantEnvironmentConverter {
 
@@ -19,8 +19,6 @@ public class TenantEnvironmentConverter {
         }
 
         TenantEnvironmentDto dto = new TenantEnvironmentDto();
-
-        dto.setId(entity.getId());
         dto.setTenantId(
                 entity.getTenantId() != null
                         ? java.util.UUID.fromString(entity.getTenantId().toString())
