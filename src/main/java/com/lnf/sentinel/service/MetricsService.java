@@ -1,10 +1,6 @@
 package com.lnf.sentinel.service;
 
-<<<<<<< HEAD
 import com.lnf.dto.sentinel.MetricsSummaryDto;
-=======
-import com.lnf.dto.sentinel.MetricSummaryDto;
->>>>>>> abf1b397f2398bbe365df39277f883e0a8cf7fe2
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.enums.IssueStatus;
 import com.lnf.sentinel.model.enums.Severity;
@@ -17,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static com.lnf.sentinel.service.IssueSpecifications.severity;
 import static com.lnf.sentinel.service.IssueSpecifications.tenantId;
@@ -33,39 +28,54 @@ public class MetricsService {
     private final IssueRepository issueRepository;
 
     @Transactional(readOnly = true)
-<<<<<<< HEAD
     public MetricsSummaryDto summary() {
-=======
-    public MetricSummaryDto summary() {
->>>>>>> abf1b397f2398bbe365df39277f883e0a8cf7fe2
-        long openTotal       = issueRepository.count(scope().and(open()));
-        long s1Count         = issueRepository.count(scope().and(open()).and(severity(Severity.S1_CRITICAL)));
-        long s2Count         = issueRepository.count(scope().and(open()).and(severity(Severity.S2_HIGH)));
-        long inProgress      = issueRepository.count(scope().and(status(IssueStatus.IN_PROGRESS)));
-        long awaitingTenant  = issueRepository.count(scope().and(status(IssueStatus.AWAITING_TENANT)));
-        long slaBreached     = issueRepository.count(scope().and(open()).and(breachingSla()));
-<<<<<<< HEAD
-        return new MetricsSummaryDto(openTotal, s1Count, s2Count, inProgress, awaitingTenant, slaBreached);
-=======
-        return new MetricSummaryDto(openTotal, s1Count, s2Count, inProgress, awaitingTenant, slaBreached);
->>>>>>> abf1b397f2398bbe365df39277f883e0a8cf7fe2
+
+        long openTotal = issueRepository.count(
+                scope().and(open()));
+
+        long s1Count = issueRepository.count(
+                scope().and(open()).and(severity(Severity.S1_CRITICAL)));
+
+        long s2Count = issueRepository.count(
+                scope().and(open()).and(severity(Severity.S2_HIGH)));
+
+        long inProgress = issueRepository.count(
+                scope().and(status(IssueStatus.IN_PROGRESS)));
+
+        long awaitingTenant = issueRepository.count(
+                scope().and(status(IssueStatus.AWAITING_TENANT)));
+
+        long slaBreached = issueRepository.count(
+                scope().and(open()).and(breachingSla()));
+
+        return new MetricsSummaryDto(
+                openTotal,
+                s1Count,
+                s2Count,
+                inProgress,
+                awaitingTenant,
+                slaBreached
+        );
     }
 
     private Specification<Issue> scope() {
-        return tenantId(TenantContext.getTenantId()); // null => cross-tenant (all)
+        return tenantId(TenantContext.getTenantId());
     }
 
     private Specification<Issue> open() {
-        return (root, query, cb) -> cb.not(root.get("status").in(CLOSED_STATES));
+        return (root, query, cb) ->
+                cb.not(root.get("status").in(CLOSED_STATES));
     }
 
     private Specification<Issue> status(IssueStatus status) {
-        return (root, query, cb) -> cb.equal(root.get("status"), status);
+        return (root, query, cb) ->
+                cb.equal(root.get("status"), status);
     }
 
     private Specification<Issue> breachingSla() {
         return (root, query, cb) -> cb.and(
                 cb.isNotNull(root.get("slaDueAt")),
-                cb.lessThan(root.get("slaDueAt"), OffsetDateTime.now()));
+                cb.lessThan(root.get("slaDueAt"), OffsetDateTime.now())
+        );
     }
 }
