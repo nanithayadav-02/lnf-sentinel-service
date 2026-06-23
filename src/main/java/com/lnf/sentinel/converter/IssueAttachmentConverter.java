@@ -3,11 +3,11 @@ package com.lnf.sentinel.converter;
 import com.lnf.dto.sentinel.IssueAttachmentDto;
 import com.lnf.sentinel.model.IssueAttachment;
 
-public class IssuseAttachmentConverter {
+public class IssueAttachmentConverter {
 
-    private IssuseAttachmentConverter(){}
+    private IssueAttachmentConverter(){}
 
-    public IssueAttachmentDto toTransportModel(IssueAttachment entity){
+    public static IssueAttachmentDto toTransportModel(IssueAttachment entity){
         if(entity==null){
             return null;
         }

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/issues")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Issues", description = "Production issues — the engineering record of truth")
 public class IssueController {
 
@@ -30,10 +32,10 @@ public class IssueController {
     @GetMapping
     @Operation(summary = "List issues (filterable, paginated)")
     public Page<IssueDto> list(
-            @RequestParam(required = false) Long tenantId,
+            @RequestParam(required = false) UUID tenantId,
             @RequestParam(required = false) IssueStatus status,
             @RequestParam(required = false) Severity severity,
-            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) UUID assigneeId,
             @RequestParam(required = false) String search,
             Pageable pageable) {
         return issueService.list(tenantId, status, severity, assigneeId, search, pageable);
@@ -41,25 +43,25 @@ public class IssueController {
 
     @PostMapping
     @Operation(summary = "Create an issue (generates key, sets SLA, writes initial history)")
-    public ResponseEntity<IssueDto> create(@Valid @RequestBody IssueDto req) {
+    public ResponseEntity<IssueDto> create(@RequestBody IssueDto req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(issueService.create(req));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get one issue (tenant-scoped)")
-    public IssueDto get(@PathVariable Long id) {
+    public IssueDto get(@PathVariable UUID id) {
         return issueService.get(id);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update mutable fields")
-    public IssueDto update(@PathVariable Long id, @Valid @RequestBody IssueDto req) {
+    public IssueDto update(@PathVariable UUID id,  @RequestBody  final IssueDto req) {
         return issueService.update(id, req);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Change status (+ resolution/root cause on resolve/close)")
-    public IssueDto changeStatus(@PathVariable Long id, @Valid @RequestBody IssueDto req) {
+    public IssueDto changeStatus(@PathVariable UUID id,@RequestBody final IssueDto req) {
         return issueService.changeStatus(id, req);
     }
 
@@ -82,7 +84,7 @@ public class IssueController {
     }
 
     @PostMapping("/{id}/links")
-    public ResponseEntity<IssueLinkDto> createLink(@PathVariable Long id,
+    public ResponseEntity<IssueLinkDto> createLink(@PathVariable UUID id,
                                                    @Valid @RequestBody IssueLinkDto req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.createLink(id, req));
     }
@@ -101,26 +103,26 @@ public class IssueController {
 
     @PostMapping("/{id}/watchers/{userId}")
     @Operation(summary = "Watch an issue (idempotent)")
-    public IssueWatcherDto addWatcher(@PathVariable Long id, @PathVariable Long userId) {
+    public IssueWatcherDto addWatcher(@PathVariable UUID id, @PathVariable UUID userId) {
         return collaborationService.addWatcher(id, userId);
     }
 
     @DeleteMapping("/{id}/watchers/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Unwatch an issue (idempotent)")
-    public void removeWatcher(@PathVariable Long id, @PathVariable Long userId) {
+    public void removeWatcher(@PathVariable UUID id, @PathVariable UUID userId) {
         collaborationService.removeWatcher(id, userId);
     }
 
     // ---- attachments ----
     @GetMapping("/{id}/attachments")
-    public List<IssueAttachmentDto> listAttachments(@PathVariable Long id) {
+    public List<IssueAttachmentDto> listAttachments(@PathVariable UUID id) {
         return collaborationService.listAttachments(id);
     }
 
     @PostMapping("/{id}/attachments")
     @Operation(summary = "Upload attachment metadata (binary lives in blob storage)")
-    public ResponseEntity<IssueAttachmentDto> addAttachment(@PathVariable Long id,
+    public ResponseEntity<IssueAttachmentDto> addAttachment(@PathVariable UUID id,
                                                             @Valid @RequestBody IssueAttachmentDto req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.addAttachment(id, req));
     }

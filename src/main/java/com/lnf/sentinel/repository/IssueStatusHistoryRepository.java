@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IssueStatusHistoryRepository extends JpaRepository<IssueStatusHistory, UUID> {
-    List<IssueStatusHistory> findByIssueIdOrderByChangedAtAsc(Long issueId);
+    List<IssueStatusHistory> findByIssueId(UUID issueId);
 }

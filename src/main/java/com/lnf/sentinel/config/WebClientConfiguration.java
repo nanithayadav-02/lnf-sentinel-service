@@ -76,11 +76,7 @@ public class WebClientConfiguration {
                 return Mono.just(clientRequest);
             }
 
-<<<<<<< HEAD
-            String currentTenant = null;
-=======
             String currentTenant =null;
->>>>>>> d4f6e36 (Refactor: improve DTO mapping and service, repository, and controller layers)
 
             String tenantPrefix = (currentTenant != null && currentTenant.contains("-"))
                     ? currentTenant.split("-")[0]

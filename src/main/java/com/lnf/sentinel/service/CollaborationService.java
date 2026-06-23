@@ -3,10 +3,15 @@ package com.lnf.sentinel.service;
 import com.lnf.dto.sentinel.IssueAttachmentDto;
 import com.lnf.dto.sentinel.IssueCommentDto;
 import com.lnf.dto.sentinel.IssueLinkDto;
+import com.lnf.dto.sentinel.IssueWatcherDto;
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.sentinel.converter.IssueAttachmentConverter;
 import com.lnf.sentinel.converter.IssueCommentConverter;
+import com.lnf.sentinel.converter.IssueLinkConverter;
+import com.lnf.sentinel.converter.IssueWatcherConverter;
 import com.lnf.sentinel.model.*;
+import com.lnf.sentinel.model.enums.LinkType;
 import com.lnf.sentinel.repository.*;
 import com.lnf.sentinel.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
@@ -46,38 +51,39 @@ public class CollaborationService {
     @Transactional(readOnly = true)
     public List<IssueCommentDto> listComments(UUID issueId) {
         requireIssue(issueId);
-        return commentRepository.findByIssueIdOrderByCreatedAtAsc(issueId)
+        return commentRepository.findByIssueId(issueId)
                 .stream().map(IssueCommentConverter::toTransportModel).toList();
     }
 
     // ---- links ------------------------------------------------------------
 
     @Transactional
-    public LinkResponse createLink(Long sourceIssueId, CreateLinkRequest req) {
+    public IssueLinkDto createLink(UUID sourceIssueId, IssueLinkDto req) {
         Issue source = requireIssue(sourceIssueId);
-        if (sourceIssueId.equals(req.targetIssueId())) {
+        if (sourceIssueId.equals(req.getTargetIssueId())) {
             throw new LnFBadRequestException("An issue cannot be linked to itself");
         }
         // Target must exist and be visible to the current tenant.
-        requireIssue(req.targetIssueId());
+        requireIssue(req.getTargetIssueId());
         if (linkRepository.existsBySourceIssueIdAndTargetIssueIdAndLinkType(
-                sourceIssueId, req.targetIssueId(), req.linkType())) {
+                sourceIssueId, req.getTargetIssueId(), LinkType.valueOf(req.getLinkType()))) {
             throw new LnFBadRequestException("That link already exists");
         }
         IssueLink link = new IssueLink();
         link.setSourceIssueId(source.getId());
-        link.setTargetIssueId(req.targetIssueId());
-        link.setLinkType(req.linkType());
-        link.setCreatedBy(req.createdBy());
-        return LinkResponse.from(linkRepository.save(link), sourceIssueId);
+        link.setTargetIssueId(req.getTargetIssueId());
+        link.setLinkType(LinkType.valueOf(req.getLinkType()));
+        link.setCreatedBy(req.getCreatedBy());
+        linkRepository.save(link);
+        return IssueLinkConverter.toDto(link);
     }
 
     @Transactional(readOnly = true)
     public List<IssueLinkDto> listLinks(UUID issueId) {
         requireIssue(issueId);
         List<IssueLinkDto> out = new ArrayList<>();
-        linkRepository.findBySourceIssueId(issueId).forEach(l -> out.add(LinkResponse.from(l, issueId)));
-        linkRepository.findByTargetIssueId(issueId).forEach(l -> out.add(LinkResponse.from(l, issueId)));
+        linkRepository.findBySourceIssueId(issueId).forEach(l -> out.add(IssueLinkConverter.toDto(l)));
+        linkRepository.findByTargetIssueId(issueId).forEach(l -> out.add(IssueLinkConverter.toDto(l)));
         return out;
     }
 
@@ -93,16 +99,17 @@ public class CollaborationService {
     // ---- watchers (idempotent) -------------------------------------------
 
     @Transactional
-    public WatcherResponse addWatcher(Long issueId, Long userId) {
+    public IssueWatcherDto addWatcher(UUID issueId, UUID userId) {
         requireIssue(issueId);
-        return WatcherResponse.from(
-                watcherRepository.findByIssueIdAndUserId(issueId, userId)
-                        .orElseGet(() -> {
-                            IssueWatcher w = new IssueWatcher();
-                            w.setIssueId(issueId);
-                            w.setUserId(userId);
-                            return watcherRepository.save(w);
-                        }));
+        IssueWatcher w = watcherRepository.findByIssueIdAndUserId(issueId, userId)
+                .orElseGet(() -> {
+                    IssueWatcher watcher=new IssueWatcher();
+                    watcher.setIssueId(issueId);
+                    watcher.setUserId(userId);
+                    return watcherRepository.save(watcher);
+                });
+        return IssueWatcherConverter.toDto(w);
+
     }
 
     @Transactional
@@ -113,10 +120,10 @@ public class CollaborationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Wat> listWatchers(UUID issueId) {
+    public List<IssueWatcherDto> listWatchers(UUID issueId) {
         requireIssue(issueId);
         return watcherRepository.findByIssueId(issueId)
-                .stream().map(WatcherResponse::from).toList();
+                .stream().map(IssueWatcherConverter::toDto).toList();
     }
 
     // ---- attachments ------------------------------------------------------
@@ -132,14 +139,14 @@ public class CollaborationService {
         attachment.setSizeBytes(req.getSizeBytes());
         attachment.setUploadedBy(req.getUploadedBy());
         attachmentRepository.save(attachment);
-        return IssueCommentConverter.toTransportModel(attachment);
+        return IssueAttachmentConverter.toTransportModel(attachment);
     }
 
     @Transactional(readOnly = true)
     public List<IssueAttachmentDto> listAttachments(UUID issueId) {
         requireIssue(issueId);
-        return attachmentRepository.findByIssueIdOrderByCreatedAtAsc(issueId)
-                .stream().map(IssueAttachment::getContentType).toList();
+        return attachmentRepository.findByIssueId(issueId)
+                .stream().map(IssueAttachmentConverter::toTransportModel).toList();
     }
 
     // ---- helper -----------------------------------------------------------

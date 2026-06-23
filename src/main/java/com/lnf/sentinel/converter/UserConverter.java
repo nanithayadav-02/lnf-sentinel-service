@@ -17,8 +17,6 @@ public class UserConverter {
         }
 
         UserDto dto = new UserDto();
-
-        dto.setId(entity.getId());
         dto.setEmail(entity.getEmail());
         dto.setFullName(entity.getFullName());
 
