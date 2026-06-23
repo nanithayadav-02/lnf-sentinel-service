@@ -3,8 +3,9 @@ package com.lnf.sentinel.converter;
 
 
 import com.lnf.dto.sentinel.TenantEnvironmentDto;
-import com.lnf.sentinel.domain.TenantEnvironment;
-import com.lnf.sentinel.domain.enums.Environment;
+
+import com.lnf.sentinel.model.enums.Environment;
+import com.lnf.sentinel.model.TenantEnvironment;
 
 public class TenantEnvironmentConverter {
 

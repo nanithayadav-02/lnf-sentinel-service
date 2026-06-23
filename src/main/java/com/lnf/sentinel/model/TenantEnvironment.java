@@ -21,7 +21,7 @@ public class TenantEnvironment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
