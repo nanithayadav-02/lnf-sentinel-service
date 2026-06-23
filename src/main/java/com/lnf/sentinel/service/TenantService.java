@@ -3,6 +3,7 @@ package com.lnf.sentinel.service;
 import com.lnf.dto.sentinel.TenantDto;
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.sentinel.converter.TenantConverter;
 import com.lnf.sentinel.model.Tenant;
 import com.lnf.sentinel.model.enums.SupportTier;
 import com.lnf.sentinel.model.enums.TenantStatus;
@@ -34,18 +35,18 @@ public class TenantService {
         t.setProductionUrl(req.getProductionUrl());
         t.setPrimaryContactName(req.getPrimaryContactName());
         t.setPrimaryContactEmail(req.getPrimaryContactEmail());
-        return TenantDto.from(tenantRepository.save(t));
+        return TenantConverter.toTransportModel(tenantRepository.save(t));
     }
 
     @Transactional(readOnly = true)
     public List<TenantDto> list() {
-        return tenantRepository.findAll().stream().map(TenantDto::from).toList();
+        return tenantRepository.findAll().stream().map(TenantConverter::toTransportModel).toList();
     }
 
     @Transactional(readOnly = true)
     public TenantDto get(UUID id) {
         return tenantRepository.findById(id)
-                .map(TenantDto::from)
+                .map(TenantConverter::toTransportModel)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Tenant not found: " + id));
     }
 }
