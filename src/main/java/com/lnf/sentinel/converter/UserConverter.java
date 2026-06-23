@@ -1,8 +1,8 @@
 package com.lnf.sentinel.converter;
 
 import com.lnf.dto.sentinel.UserDto;
-import com.lnf.sentinel.domain.User;
-import com.lnf.sentinel.domain.enums.UserRole;
+import com.lnf.sentinel.model.User;
+import com.lnf.sentinel.model.enums.UserRole;
 
 public class UserConverter {
 

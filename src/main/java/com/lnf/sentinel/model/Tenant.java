@@ -6,10 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tenants")
@@ -20,7 +18,7 @@ public class Tenant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "tenant_code", nullable = false, unique = true, length = 40)
     private String tenantCode;
@@ -48,11 +46,5 @@ public class Tenant {
     @Column(name = "primary_contact_email", length = 160)
     private String primaryContactEmail;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

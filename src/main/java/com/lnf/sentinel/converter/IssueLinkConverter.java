@@ -17,7 +17,7 @@ public final class IssueLinkConverter {
 
         IssueLinkDto dto = new IssueLinkDto();
 
-        //dto.setId(entity.getI);
+
         dto.setSourceIssueId(entity.getSourceIssueId());
         dto.setTargetIssueId(entity.getTargetIssueId());
 
