@@ -9,7 +9,7 @@ public final class IssueWatcherConverter {
     private  IssueWatcherConverter(){
 
     }
-    public static IssueWatcherDto toDto(IssueWatcher entity){
+    public static IssueWatcherDto toTransportModel(IssueWatcher entity){
         if(entity == null){
             return  null;
         }
@@ -20,7 +20,7 @@ public final class IssueWatcherConverter {
         return dto;
     }
 
-    public  static  IssueWatcher toEntity(IssueWatcherDto dto , IssueWatcher entity){
+    public  static  IssueWatcher toEntityModel(IssueWatcherDto dto , IssueWatcher entity){
         entity.setId(dto.getId());
         entity.setIssueId(dto.getIssueId());
         entity.setUserId(dto.getUserId());

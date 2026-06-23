@@ -1,7 +1,9 @@
 package com.lnf.sentinel.model;
 
 import com.lnf.model.AuditableEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.util.UUID;
@@ -15,17 +17,22 @@ import java.util.UUID;
 @NoArgsConstructor
 public class IssueComment extends AuditableEntity {
 
-
     @Column(name = "issue_id", nullable = false)
     private UUID issueId;
 
-    @Column(name = "author_id")
-    private UUID authorId;
+    @Column(name = "user_id")
+    private UUID userId;
+
+    @Column(name = "user_name")
+    private UUID userName;
+
+    @Column(name = "tenant_name") //if it is external
+    private String tenantName;
 
     @Column(nullable = false, columnDefinition = "text")
     private String body;
 
-    /** TRUE = ops-only note (not tenant-visible). */
     @Column(nullable = false)
     private boolean internal = true;
+
 }

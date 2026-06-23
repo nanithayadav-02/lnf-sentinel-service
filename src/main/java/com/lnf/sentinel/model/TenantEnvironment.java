@@ -27,10 +27,10 @@ public class TenantEnvironment extends AuditableEntity {
     @Column(nullable = false, length = 20)
     private Environment environment;
 
-    @Column(name = "base_url", length = 255)
+    @Column(name = "base_url")
     private String baseUrl;
 
-    @Column(name = "health_check_url", length = 255)
+    @Column(name = "health_check_url")
     private String healthCheckUrl;
 
     @Column(length = 40)

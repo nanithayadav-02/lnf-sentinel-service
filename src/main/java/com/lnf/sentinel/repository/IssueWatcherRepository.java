@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IssueWatcherRepository extends JpaRepository<IssueWatcher, UUID> {
+
     List<IssueWatcher> findByIssueId(UUID issueId);
     Optional<IssueWatcher> findByIssueIdAndUserId(UUID issueId, UUID userId);
     boolean existsByIssueIdAndUserId(UUID issueId, UUID userId);
+
 }

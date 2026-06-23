@@ -5,13 +5,9 @@ import com.lnf.sentinel.model.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.UUID;
 
-/**
- * The core record: one production issue belonging to one tenant.
- * This IS the engineering record of truth: triage, fix and resolution live here.
- */
 @Entity
 @Table(name = "issues")
 @Getter
@@ -24,14 +20,20 @@ public class Issue extends AuditableEntity {
     @Column(name = "issue_key", nullable = false, unique = true, length = 20)
     private String issueKey;
 
-    @Column(name = "tenant_id", nullable = false)
-    private UUID tenantId;
+    @Column(name = "summary", nullable = false)
+    private String summary;
 
-    @Column(nullable = false, length = 240)
-    private String title;
-
-    @Column(columnDefinition = "text")
     private String description;
+
+    @Column(name = "tenant_code")
+    private String tenantCode;
+
+    @Column(name = "tenant_name")
+    private String tenantName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private IssueStatus status = IssueStatus.NEW;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -43,45 +45,40 @@ public class Issue extends AuditableEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private IssueStatus status = IssueStatus.NEW;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
     private Category category = Category.BUG;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Environment environment = Environment.PRODUCTION;
 
-    @Column(name = "affected_service", length = 120)
-    private String affectedService;
-
-    @Column(name = "reported_by")
-    private Long reportedBy;
-
     @Column(name = "assignee_id")
     private UUID assigneeId;
+
+    @Column(name = "assignee_name")
+    private String assignee;
+
+    @Column(name = "affected_service", length = 120)
+    private String affectedService;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Resolution resolution;
 
-    @Column(name = "root_cause", columnDefinition = "text")
-    private String rootCause;
-
-    @Column(name = "fix_version", length = 60)
-    private String fixVersion;
+    @Column(name = "reported_by")
+    private String reportedBy;
 
     @Column(name = "detected_at")
-    private OffsetDateTime detectedAt;
+    private Date detectedAt;
 
     @Column(name = "sla_due_at")
-    private OffsetDateTime slaDueAt;
+    private Date slaDueAt;
 
     @Column(name = "resolved_at")
-    private OffsetDateTime resolvedAt;
+    private Date resolvedAt;
 
-    /** True when past SLA and not yet in a terminal state. */
+    /**
+     * True when past SLA and not yet in a terminal state.
+     */
     @Transient
     public boolean isSlaBreached() {
         if (slaDueAt == null) {
@@ -90,6 +87,7 @@ public class Issue extends AuditableEntity {
         if (status == IssueStatus.RESOLVED || status == IssueStatus.CLOSED) {
             return false;
         }
-        return OffsetDateTime.now().isAfter(slaDueAt);
+        return new Date().after(slaDueAt);
     }
+
 }

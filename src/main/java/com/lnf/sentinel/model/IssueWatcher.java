@@ -17,10 +17,14 @@ import java.util.UUID;
 @NoArgsConstructor
 public class IssueWatcher extends AuditableEntity {
 
+
     @Column(name = "issue_id", nullable = false)
     private UUID issueId;
 
     @Column(name = "user_id", nullable = false)
     private UUID userId;
+
+    @Column(name = "user_name")
+    private String userName;
 
 }

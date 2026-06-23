@@ -1,13 +1,11 @@
 package com.lnf.sentinel.controller;
 
-import com.lnf.dto.sentinel.*;
+import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.model.enums.IssueStatus;
 import com.lnf.sentinel.model.enums.Severity;
-import com.lnf.sentinel.service.CollaborationService;
 import com.lnf.sentinel.service.IssueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,11 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/issues")
+@RequestMapping("/sentinel/issues")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Issues", description = "Production issues — the engineering record of truth")
@@ -31,99 +29,46 @@ public class IssueController {
 
     @GetMapping
     @Operation(summary = "List issues (filterable, paginated)")
-    public Page<IssueDto> list(
-            @RequestParam(required = false) UUID tenantId,
-            @RequestParam(required = false) IssueStatus status,
-            @RequestParam(required = false) Severity severity,
-            @RequestParam(required = false) UUID assigneeId,
-            @RequestParam(required = false) String search,
-            Pageable pageable) {
-        return issueService.list(tenantId, status, severity, assigneeId, search, pageable);
+    public Page<IssueDto> list(@RequestParam(required = false) String tenantName,
+                               @RequestParam(required = false) String tenantCode,
+                               @RequestParam(required = false) IssueStatus status,
+                               @RequestParam(required = false) Severity severity,
+                               @RequestParam(required = false) UUID assigneeId,
+                               @RequestParam(required = false) String search,
+                               Pageable pageable) {
+        return issueService.list(tenantName, tenantCode, status, severity, assigneeId, search, pageable);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create an issue (generates key, sets SLA, writes initial history)")
-    public ResponseEntity<IssueDto> create(@RequestBody IssueDto req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(issueService.create(req));
+    public void create(@RequestBody IssueDto resource) {
+        issueService.create(resource);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get one issue (tenant-scoped)")
-    public IssueDto get(@PathVariable UUID id) {
-        return issueService.get(id);
+    public IssueDto findById(@PathVariable UUID id) {
+        return issueService.findById(id);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update mutable fields")
-    public IssueDto update(@PathVariable UUID id,  @RequestBody  final IssueDto req) {
-        return issueService.update(id, req);
+    public void update(@PathVariable UUID id, @RequestBody final IssueDto resource) {
+        issueService.update(id, resource);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Change status (+ resolution/root cause on resolve/close)")
-    public IssueDto changeStatus(@PathVariable UUID id,@RequestBody final IssueDto req) {
-        return issueService.changeStatus(id, req);
+    public ResponseEntity<Void> changeStatus(@PathVariable UUID id, @RequestBody final Map<String, Object> request) {
+        issueService.changeStatus(id, request);
+        return ResponseEntity.noContent().build();
     }
 
-    // ---- comments ----
-    @GetMapping("/{id}/comments")
-    public List<IssueCommentDto> listComments(@PathVariable UUID id) {
-        return collaborationService.listComments(id);
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Issue By Id")
+    public void delete(@PathVariable UUID id) {
+        issueService.deleteById(id);
     }
 
-    @PostMapping("/{id}/comments")
-    public ResponseEntity<IssueCommentDto> addComment(@PathVariable UUID id,
-                                                      @Valid @RequestBody IssueCommentDto req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.addComment(id, req));
-    }
-
-    // ---- links ----
-    @GetMapping("/{id}/links")
-    public List<IssueLinkDto> listLinks(@PathVariable UUID id) {
-        return collaborationService.listLinks(id);
-    }
-
-    @PostMapping("/{id}/links")
-    public ResponseEntity<IssueLinkDto> createLink(@PathVariable UUID id,
-                                                   @Valid @RequestBody IssueLinkDto req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.createLink(id, req));
-    }
-
-    @DeleteMapping("/links/{linkId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteLink(@PathVariable UUID linkId) {
-        collaborationService.deleteLink(linkId);
-    }
-
-    // ---- watchers ----
-    @GetMapping("/{id}/watchers")
-    public List<IssueWatcherDto> listWatchers(@PathVariable UUID id) {
-        return collaborationService.listWatchers(id);
-    }
-
-    @PostMapping("/{id}/watchers/{userId}")
-    @Operation(summary = "Watch an issue (idempotent)")
-    public IssueWatcherDto addWatcher(@PathVariable UUID id, @PathVariable UUID userId) {
-        return collaborationService.addWatcher(id, userId);
-    }
-
-    @DeleteMapping("/{id}/watchers/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Unwatch an issue (idempotent)")
-    public void removeWatcher(@PathVariable UUID id, @PathVariable UUID userId) {
-        collaborationService.removeWatcher(id, userId);
-    }
-
-    // ---- attachments ----
-    @GetMapping("/{id}/attachments")
-    public List<IssueAttachmentDto> listAttachments(@PathVariable UUID id) {
-        return collaborationService.listAttachments(id);
-    }
-
-    @PostMapping("/{id}/attachments")
-    @Operation(summary = "Upload attachment metadata (binary lives in blob storage)")
-    public ResponseEntity<IssueAttachmentDto> addAttachment(@PathVariable UUID id,
-                                                            @Valid @RequestBody IssueAttachmentDto req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(collaborationService.addAttachment(id, req));
-    }
 }

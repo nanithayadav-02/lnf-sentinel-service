@@ -8,7 +8,6 @@ public final class IssueStatusHistoryConverter {
     private IssueStatusHistoryConverter() {
     }
 
-
     public static IssueStatusHistoryDto toDto(IssueStatusHistory entity) {
 
         if (entity == null) {
@@ -18,8 +17,7 @@ public final class IssueStatusHistoryConverter {
         IssueStatusHistoryDto dto = new IssueStatusHistoryDto();
 
         dto.setIssueId(entity.getIssueId());
-        dto.setChangedBy(entity.getChangedBy());
-        dto.setNote(entity.getNote());
+        dto.setNote(entity.getNotes());
         dto.setFromStatus(
                 entity.getFromStatus() != null
                         ? entity.getFromStatus().name()
@@ -46,8 +44,7 @@ public final class IssueStatusHistoryConverter {
         }
 
         entity.setIssueId(dto.getIssueId());
-        entity.setChangedBy(dto.getChangedBy());
-        entity.setNote(dto.getNote());
+        entity.setNotes(dto.getNote());
         dto.setFromStatus(
                 entity.getFromStatus() != null
                         ? entity.getFromStatus().name()

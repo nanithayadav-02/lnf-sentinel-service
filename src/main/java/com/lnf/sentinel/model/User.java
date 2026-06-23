@@ -6,12 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.OffsetDateTime;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -30,9 +24,8 @@ public class User extends AuditableEntity {
     @Column(nullable = false, length = 20)
     private UserRole role = UserRole.ENGINEER;
 
-    /** NULL = internal staff (cross-tenant). */
-    @Column(name = "tenant_id")
-    private UUID tenantId;
+    @Column(name = "tenant_name")
+    private String tenantName; //for external one
 
     @Column(nullable = false)
     private boolean active = true;

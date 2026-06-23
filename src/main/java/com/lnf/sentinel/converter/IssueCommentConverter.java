@@ -5,23 +5,26 @@ import com.lnf.sentinel.model.IssueComment;
 
 public class IssueCommentConverter {
 
-    private IssueCommentConverter(){}
+    private IssueCommentConverter() {
+    }
 
-    public static IssueCommentDto toTransportModel(IssueComment entity){
+    public static IssueCommentDto toTransportModel(IssueComment entity) {
+
+        if (entity == null) return null;
         return IssueCommentDto.builder()
+                .id(entity.getId())
                 .issueId(entity.getIssueId())
-                .authorId(entity.getAuthorId())
                 .body(entity.getBody())
                 .internal(entity.isInternal())
                 .build();
     }
 
-
-    public IssueComment toEntityModel(IssueComment entity, IssueCommentDto dto){
-        entity.setIssueId(dto.getIssueId());
-        entity.setBody(dto.getBody());
-        entity.setInternal(dto.isInternal());
-        entity.setAuthorId(dto.getAuthorId());
+    public static IssueComment toEntityModel(IssueComment entity, IssueCommentDto transport) {
+        if (entity == null || transport == null) return null;
+        entity.setIssueId(transport.getIssueId());
+        entity.setBody(transport.getBody());
+        entity.setInternal(transport.isInternal());
         return entity;
     }
+
 }

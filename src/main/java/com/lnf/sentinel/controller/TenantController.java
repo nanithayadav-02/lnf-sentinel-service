@@ -1,7 +1,6 @@
 package com.lnf.sentinel.controller;
 
 
-//import com.lnf.sentinel.service.TenantService;
 import com.lnf.dto.sentinel.TenantDto;
 import com.lnf.sentinel.service.TenantService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/tenants")
+@RequestMapping("/sentinel/tenant")
 @RequiredArgsConstructor
 @Tag(name = "Tenants", description = "Tenant administration")
 public class TenantController {
@@ -28,12 +27,14 @@ public class TenantController {
     }
 
     @PostMapping
-    public ResponseEntity<TenantDto> create(@Valid @RequestBody TenantDto req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(tenantService.create(req));
+    public ResponseEntity<Void> create(@Valid @RequestBody TenantDto resource) {
+        tenantService.create(resource);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/{id}")
     public TenantDto get(@PathVariable UUID id) {
         return tenantService.get(id);
     }
+
 }

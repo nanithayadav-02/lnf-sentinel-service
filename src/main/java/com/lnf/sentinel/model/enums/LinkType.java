@@ -1,7 +1,21 @@
 package com.lnf.sentinel.model.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum LinkType {
-    BLOCKS, BLOCKED_BY, DUPLICATES, RELATES_TO, CAUSED_BY;
+
+    BLOCKS("Blocks"),
+    BLOCKED_BY("Blocked By"),
+    DUPLICATES("Duplicates"),
+    RELATES_TO("Relates To"),
+    CAUSED_BY("Caused By");
+
+    private final String label;
+
+    LinkType(String label) {
+        this.label = label;
+    }
 
     /** The inverse direction, used when presenting a link from the target side. */
     public LinkType inverse() {
@@ -11,4 +25,14 @@ public enum LinkType {
             case DUPLICATES, RELATES_TO, CAUSED_BY -> this;
         };
     }
+
+    public static LinkType valueOfLabel(String label) {
+        for (LinkType at : values()) {
+            if (at.label.equals(label)) {
+                return at;
+            }
+        }
+        return null;
+    }
+
 }

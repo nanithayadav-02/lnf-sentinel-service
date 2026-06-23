@@ -11,14 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/** Composable JPA Specifications used to filter issues. */
 public final class IssueSpecifications {
 
-    private IssueSpecifications() {}
+    private IssueSpecifications() {
+    }
 
-    public static Specification<Issue> tenantId(UUID tenantId) {
+    public static Specification<Issue> tenantName(String tenantName) {
         return (root, query, cb) ->
-                tenantId == null ? cb.conjunction() : cb.equal(root.get("tenantId"), tenantId);
+                tenantName == null ? cb.conjunction() : cb.equal(root.get("tenantName"), tenantName);
+    }
+
+    public static Specification<Issue> tenantCode(String tenantCode) {
+        return (root, query, cb) ->
+                tenantCode == null ? cb.conjunction() : cb.equal(root.get("tenantCode"), tenantCode);
     }
 
     public static Specification<Issue> status(IssueStatus status) {
@@ -36,7 +41,6 @@ public final class IssueSpecifications {
                 assigneeId == null ? cb.conjunction() : cb.equal(root.get("assigneeId"), assigneeId);
     }
 
-    /** Case-insensitive match across key, title, description and affected service. */
     public static Specification<Issue> search(String term) {
         return (root, query, cb) -> {
             if (!StringUtils.hasText(term)) {
@@ -48,6 +52,12 @@ public final class IssueSpecifications {
             ors.add(cb.like(cb.lower(root.get("title")), like));
             ors.add(cb.like(cb.lower(root.get("description")), like));
             ors.add(cb.like(cb.lower(root.get("affectedService")), like));
+            ors.add(cb.like(cb.lower(root.get("status")), like));
+            ors.add(cb.like(cb.lower(root.get("severity")), like));
+            ors.add(cb.like(cb.lower(root.get("summary")), like));
+            ors.add(cb.like(cb.lower(root.get("tenantCode")), like));
+            ors.add(cb.like(cb.lower(root.get("tenantName")), like));
+
             return cb.or(ors.toArray(new Predicate[0]));
         };
     }

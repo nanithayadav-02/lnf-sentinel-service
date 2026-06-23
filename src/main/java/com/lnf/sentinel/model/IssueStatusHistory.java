@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,14 +24,10 @@ public class IssueStatusHistory extends AuditableEntity {
     private IssueStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "to_status", nullable = false, length = 20)
+    @Column(name = "to_status", length = 20)
     private IssueStatus toStatus;
 
-    @Column(name = "changed_by")
-    private Long changedBy;
-
     @Column(length = 500)
-    private String note;
-
+    private String notes;
 
 }

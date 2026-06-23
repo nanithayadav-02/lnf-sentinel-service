@@ -10,58 +10,60 @@ public class IssueConverter {
     private IssueConverter() {
     }
 
-    public static IssueDto toTransportModel(Issue entity){
-        if(entity==null){
-            return null;
-        }
+    public static IssueDto toTransportModel(Issue entity) {
+
+        if (entity == null) return null;
+
         return IssueDto.builder()
-                .issueKey(entity.getIssueKey())
-                .environment(String.valueOf(entity.getEnvironment()))
-                .fixVersion(entity.getFixVersion())
+                .id(entity.getId())
+                .summary(entity.getSummary())
+                .description(entity.getDescription())
+                .tenantCode(entity.getTenantCode())
+                .tenantName(entity.getTenantName())
+                .status(String.valueOf(entity.getStatus()))
+                .severity(String.valueOf(entity.getSeverity()))
                 .priority(String.valueOf(entity.getPriority()))
+                .category(String.valueOf(entity.getCategory()))
+                .environment(String.valueOf(entity.getEnvironment()))
+                .assigneeId(entity.getAssigneeId())
+                .assignee(entity.getAssignee())
+                .affectedService(entity.getAffectedService())
+                .resolution(String.valueOf(entity.getResolution()))
                 .detectedAt(entity.getDetectedAt())
                 .reportedBy(entity.getReportedBy())
-                .resolvedAt(entity.getResolvedAt())
-                .resolution(String.valueOf(entity.getResolution()))
-                .severity(String.valueOf(entity.getSeverity()))
-                .title(entity.getTitle())
                 .slaDueAt(entity.getSlaDueAt())
-                .status(String.valueOf(entity.getStatus()))
-                .description(entity.getDescription())
-                .tenantId(entity.getTenantId())
-                .affectedService(entity.getAffectedService())
-                .category(String.valueOf(entity.getCategory()))
-                .assigneeId(entity.getAssigneeId())
-                .rootCause(entity.getRootCause())
-                .title(entity.getTitle())
+                .resolvedAt(entity.getResolvedAt())
+                .slaBreached(entity.isSlaBreached())
                 .build();
+
     }
 
-    public static Issue toEntityModel(IssueDto dto,Issue entity){
+    public static Issue toEntityModel(IssueDto transport, Issue entity) {
 
-        if(dto==null ||entity==null){
-            return null;
-        }
+        if (transport == null || entity == null) return null;
 
-        entity.setCategory(Category.valueOf(dto.getCategory()));
-        entity.setDescription(dto.getDescription());
-        entity.setAssigneeId(dto.getAssigneeId());
-        entity.setEnvironment(Environment.valueOf(dto.getEnvironment()));
-        entity.setIssueKey(dto.getIssueKey());
-        entity.setPriority(Priority.valueOf(dto.getPriority()));
-        entity.setResolution(Resolution.valueOf(dto.getResolution()));
-        entity.setDetectedAt(dto.getDetectedAt());
-     entity.setFixVersion(dto.getFixVersion());
-     entity.setReportedBy(dto.getReportedBy());
-     entity.setAffectedService(dto.getAffectedService());
-     entity.setResolvedAt(dto.getResolvedAt());
-     entity.setRootCause(dto.getRootCause());
-     entity.setSeverity(Severity.valueOf(dto.getSeverity()));
-     entity.setStatus(IssueStatus.valueOf(dto.getStatus()));
-     entity.setTitle(dto.getTitle());
-     entity.setTenantId(dto.getTenantId());
-     entity.setSlaDueAt(dto.getSlaDueAt());
-       return entity;
+        Issue issue = new Issue();
+        issue.setIssueKey(transport.getIssueKey());
+        issue.setSummary(transport.getSummary());
+        issue.setDescription(transport.getDescription());
+        issue.setTenantCode(transport.getTenantCode());
+        issue.setTenantName(transport.getTenantName());
+        issue.setStatus(IssueStatus.valueOf(transport.getStatus()));
+        issue.setSeverity(Severity.valueOf(transport.getSeverity()));
+        issue.setPriority(Priority.valueOf(transport.getPriority()));
+        issue.setCategory(Category.valueOf(transport.getCategory()));
+        issue.setEnvironment(Environment.valueOf(transport.getEnvironment()));
+        issue.setAssigneeId(transport.getAssigneeId());
+        issue.setAssignee(transport.getAssignee());
+        issue.setReportedBy(transport.getReportedBy());
+        issue.setAffectedService(transport.getAffectedService());
+        issue.setResolution(Resolution.valueOf(transport.getResolution()));
+        issue.setDetectedAt(transport.getDetectedAt());
+        issue.setSlaDueAt(transport.getSlaDueAt());
+        issue.setResolvedAt(transport.getResolvedAt());
+        issue.setId(transport.getId());
+        return issue;
+
     }
 
 }
