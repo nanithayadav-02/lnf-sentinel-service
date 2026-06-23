@@ -1,15 +1,12 @@
 package com.lnf.sentinel.model;
 
+import com.lnf.model.AuditableEntity;
 import com.lnf.sentinel.model.enums.SupportTier;
 import com.lnf.sentinel.model.enums.TenantStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -17,11 +14,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Tenant {
+public class Tenant extends AuditableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
 
     @Column(name = "tenant_code", nullable = false, unique = true, length = 40)
     private String tenantCode;
@@ -48,12 +42,4 @@ public class Tenant {
 
     @Column(name = "primary_contact_email", length = 160)
     private String primaryContactEmail;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

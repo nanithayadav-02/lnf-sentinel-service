@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IssueCommentRepository extends JpaRepository<IssueComment, UUID> {
-    List<IssueComment> findByIssueIdOrderByCreatedAtAsc(UUID issueId);
+    List<IssueComment> findByIssueId(UUID issueId);
 }

@@ -1,7 +1,9 @@
 package com.lnf.sentinel.service;
 
+import com.lnf.dto.sentinel.TenantDto;
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.sentinel.converter.TenantConverter;
 import com.lnf.sentinel.model.Tenant;
 import com.lnf.sentinel.model.enums.SupportTier;
 import com.lnf.sentinel.model.enums.TenantStatus;
@@ -11,7 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-/*
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class TenantService {
@@ -19,32 +22,31 @@ public class TenantService {
     private final TenantRepository tenantRepository;
 
     @Transactional
-    public TenantResponse create(CreateTenantRequest req) {
-        if (tenantRepository.existsByTenantCode(req.tenantCode())) {
-            throw new LnFBadRequestException("Tenant code already exists: " + req.tenantCode());
+    public TenantDto create(TenantDto req) {
+        if (tenantRepository.existsByTenantCode(req.getTenantCode())) {
+            throw new LnFBadRequestException("Tenant code already exists: " + req.getTenantCode());
         }
         Tenant t = new Tenant();
-        t.setTenantCode(req.tenantCode());
-        t.setName(req.name());
-        t.setStatus(req.status() != null ? req.status() : TenantStatus.ACTIVE);
-        t.setSupportTier(req.supportTier() != null ? req.supportTier() : SupportTier.STANDARD);
-        t.setRegion(req.region());
-        t.setProductionUrl(req.productionUrl());
-        t.setPrimaryContactName(req.primaryContactName());
-        t.setPrimaryContactEmail(req.primaryContactEmail());
-        return TenantResponse.from(tenantRepository.save(t));
+        t.setTenantCode(req.getTenantCode());
+        t.setName(req.getName());
+        t.setStatus(req.getStatus() != null ? TenantStatus.valueOf(req.getStatus()): TenantStatus.ACTIVE);
+        t.setSupportTier(req.getSupportTier() != null ?  SupportTier.valueOf(req.getSupportTier()) : SupportTier.STANDARD);
+        t.setRegion(req.getRegion());
+        t.setProductionUrl(req.getProductionUrl());
+        t.setPrimaryContactName(req.getPrimaryContactName());
+        t.setPrimaryContactEmail(req.getPrimaryContactEmail());
+        return TenantConverter.toTransportModel(tenantRepository.save(t));
     }
 
     @Transactional(readOnly = true)
-    public List<TenantResponse> list() {
-        return tenantRepository.findAll().stream().map(TenantResponse::from).toList();
+    public List<TenantDto> list() {
+        return tenantRepository.findAll().stream().map(TenantConverter::toTransportModel).toList();
     }
 
     @Transactional(readOnly = true)
-    public TenantResponse get(Long id) {
+    public TenantDto get(UUID id) {
         return tenantRepository.findById(id)
-                .map(TenantResponse::from)
+                .map(TenantConverter::toTransportModel)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Tenant not found: " + id));
     }
 }
-*/

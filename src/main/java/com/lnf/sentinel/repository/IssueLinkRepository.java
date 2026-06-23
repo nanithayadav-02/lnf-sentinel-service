@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface IssueLinkRepository extends JpaRepository<IssueLink, UUID> {
     List<IssueLink> findBySourceIssueId(UUID sourceIssueId);
     List<IssueLink> findByTargetIssueId(UUID targetIssueId);
-    boolean existsBySourceIssueIdAndTargetIssueIdAndLinkType(Long sourceIssueId, Long targetIssueId, LinkType linkType);
+    boolean existsBySourceIssueIdAndTargetIssueIdAndLinkType(UUID sourceIssueId, UUID targetIssueId, LinkType linkType);
 }

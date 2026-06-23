@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TenantEnvironmentRepository extends JpaRepository<TenantEnvironment, UUID> {
-    List<TenantEnvironment> findByTenantId(Long tenantId);
+    List<TenantEnvironment> findByTenantId(UUID tenantId);
 }

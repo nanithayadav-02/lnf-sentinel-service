@@ -8,6 +8,11 @@ import com.lnf.sentinel.model.enums.SupportTier;
 import com.lnf.sentinel.model.enums.TenantStatus;
 import com.lnf.sentinel.model.Tenant;
 
+import com.lnf.sentinel.model.Tenant;
+import com.lnf.sentinel.model.enums.SupportTier;
+import com.lnf.sentinel.model.enums.TenantStatus;
+
+
 public class TenantConverter {
 
     private TenantConverter() {
