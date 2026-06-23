@@ -1,5 +1,6 @@
 package com.lnf.sentinel.service;
 
+import com.lnf.dto.sentinel.MetricSummaryDto;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.enums.IssueStatus;
 import com.lnf.sentinel.model.enums.Severity;
@@ -27,14 +28,14 @@ public class MetricsService {
     private final IssueRepository issueRepository;
 
     @Transactional(readOnly = true)
-    public MetricsSummaryResponse summary() {
+    public MetricSummaryDto summary() {
         long openTotal       = issueRepository.count(scope().and(open()));
         long s1Count         = issueRepository.count(scope().and(open()).and(severity(Severity.S1_CRITICAL)));
         long s2Count         = issueRepository.count(scope().and(open()).and(severity(Severity.S2_HIGH)));
         long inProgress      = issueRepository.count(scope().and(status(IssueStatus.IN_PROGRESS)));
         long awaitingTenant  = issueRepository.count(scope().and(status(IssueStatus.AWAITING_TENANT)));
         long slaBreached     = issueRepository.count(scope().and(open()).and(breachingSla()));
-        return new MetricsSummaryResponse(openTotal, s1Count, s2Count, inProgress, awaitingTenant, slaBreached);
+        return new MetricSummaryDto(openTotal, s1Count, s2Count, inProgress, awaitingTenant, slaBreached);
     }
 
     private Specification<Issue> scope() {
