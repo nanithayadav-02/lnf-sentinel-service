@@ -7,8 +7,7 @@ import com.lnf.sentinel.converter.IssueConverter;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.IssueStatusHistory;
 import com.lnf.sentinel.model.Tenant;
-import com.lnf.sentinel.model.enums.IssueStatus;
-import com.lnf.sentinel.model.enums.Severity;
+import com.lnf.sentinel.model.enums.*;
 import com.lnf.sentinel.repository.IssueRepository;
 import com.lnf.sentinel.repository.IssueStatusHistoryRepository;
 import com.lnf.sentinel.repository.TenantRepository;
@@ -44,18 +43,38 @@ public class IssueService {
     @Transactional
     public void create(IssueDto resource) {
         resolveTenant(resource);
+
+        if (resource.getTenantCode() == null) {
+            throw new LnFException("Tenant Id is required");
+        }
         Issue issue = new Issue();
-        Long seq=issueRepository.nextIssueKeyNumber();
-        issue.setIssueKey("ISSUE-"+seq);
-        //issue.setIssueKey(KEY_PREFIX + issueRepository.nextIssueKeyNumber());
+
+        issue.setIssueKey("ISSUE-" + issueRepository.nextIssueKeyNumber());
+        issue.setSummary(resource.getSummary());
+        issue.setDescription(resource.getDescription());
+
+        issue.setTenantCode(resource.getTenantCode());
+        issue.setTenantName(resource.getTenantName());
+
+        issue.setSeverity(Severity.valueOf(resource.getSeverity()));
+        issue.setPriority(Priority.valueOf(resource.getPriority()));
+        issue.setCategory(Category.valueOf(resource.getCategory()));
+        issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
+
+        issue.setAssigneeId(resource.getAssigneeId());
+        issue.setAssignee(resource.getAssignee());
+        issue.setReportedBy(resource.getReportedBy());
+
         issue.setStatus(IssueStatus.NEW);
 
-        Date detectedAt = resource.getDetectedAt() != null ? resource.getDetectedAt() : new Date();
-        issue.setDetectedAt(detectedAt);
-        issue.setSlaDueAt(Date.from(detectedAt.toInstant().plus(issue.getSeverity().slaTarget())));
+        Date detectedAt = resource.getDetectedAt() != null
+                ? resource.getDetectedAt()
+                : new Date();
 
-        Issue saved = issueRepository.save(issue);
-        recordHistory(saved, IssueStatus.NEW, IssueStatus.NEW, "IssueCreated");
+        issue.setDetectedAt(detectedAt);
+
+        issue.setSlaDueAt(resource.getSlaDueAt());
+        issueRepository.save(issue);
     }
 
     private void resolveTenant(IssueDto resource) {
@@ -71,7 +90,7 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public Page<IssueDto> list(String tenantName, String tenantCode, IssueStatus status, Severity severity,
+    public Page<IssueDto> list(String tenantName, UUID tenantCode, IssueStatus status, Severity severity,
                                UUID assigneeId, String search, Pageable pageable) {
         Specification<Issue> spec = Specification
                 .where(tenantName(tenantName))
@@ -139,6 +158,13 @@ public class IssueService {
     private Issue searchForIssueId(UUID id) {
         return issueRepository.findById(id)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + id));
+    }
+
+    public static Specification<Issue> tenantCode(UUID tenantCode) {
+        return (root, query, cb) -> {
+            if (tenantCode == null) return null;
+            return cb.equal(root.get("tenantCode"), tenantCode);
+        };
     }
 
 }
