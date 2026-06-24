@@ -45,7 +45,9 @@ public class IssueService {
     public void create(IssueDto resource) {
         resolveTenant(resource);
         Issue issue = new Issue();
-        issue.setIssueKey(KEY_PREFIX + issueRepository.nextIssueKeyNumber());
+        Long seq=issueRepository.nextIssueKeyNumber();
+        issue.setIssueKey("ISSUE-"+seq);
+        //issue.setIssueKey(KEY_PREFIX + issueRepository.nextIssueKeyNumber());
         issue.setStatus(IssueStatus.NEW);
 
         Date detectedAt = resource.getDetectedAt() != null ? resource.getDetectedAt() : new Date();
@@ -61,7 +63,7 @@ public class IssueService {
             String tenantName = tenantFilterResolver.resolvePrefix();
             Tenant tenant = searchForTenantName(tenantName);
             resource.setTenantName(tenantName);
-            resource.setTenantCode(tenant.getTenantCode());
+            resource.setTenantCode(UUID.fromString(tenant.getTenantCode()));
         } else {
             resource.setTenantName(resource.getTenantName());
             resource.setTenantCode(resource.getTenantCode());
