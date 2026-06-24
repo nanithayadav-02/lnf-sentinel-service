@@ -11,8 +11,6 @@ import java.util.UUID;
 
 public interface IssueRepository extends JpaRepository<Issue, UUID>, JpaSpecificationExecutor<Issue> {
 
-    Optional<Issue> findByIdAndTenantId(UUID id, UUID tenantId);
-
     Optional<Issue> findByIssueKey(String issueKey);
 
     Optional<Issue> findById(UUID issueId);

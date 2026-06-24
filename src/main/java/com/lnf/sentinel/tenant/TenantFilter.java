@@ -2,6 +2,7 @@ package com.lnf.sentinel.tenant;
 
 import com.lnf.sentinel.repository.TenantRepository;
 import com.lnf.sentinel.model.Tenant;
+import com.lnf.tenant.core.context.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +42,7 @@ public class TenantFilter extends OncePerRequestFilter {
             UUID tenantId = resolveTenant(request);
 
             if (tenantId != null) {
-                TenantContext.setTenantId(tenantId);
+                TenantContext.setCurrentTenant(String.valueOf(tenantId));
             }
 
             chain.doFilter(request, response);

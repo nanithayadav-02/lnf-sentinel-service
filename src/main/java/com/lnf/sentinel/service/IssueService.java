@@ -129,9 +129,9 @@ public class IssueService {
         historyRepository.save(h);
     }
 
-    private Tenant searchForTenantName(String tenantName) {
-        return tenantRepository.findByTenantName(tenantName).orElseThrow(() ->
-                new LnFEntityNotFoundException("Tenant with name [%s] does not exist".formatted(tenantName)));
+    private Tenant searchForTenantName(String tenantCode) {
+        return tenantRepository.findByTenantCode(tenantCode).orElseThrow(() ->
+                new LnFEntityNotFoundException("Tenant with name [%s] does not exist".formatted(tenantCode)));
     }
 
     private Issue searchForIssueId(UUID id) {

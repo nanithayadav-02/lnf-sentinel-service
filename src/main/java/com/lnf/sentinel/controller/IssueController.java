@@ -25,7 +25,6 @@ import java.util.UUID;
 public class IssueController {
 
     private final IssueService issueService;
-    private final CollaborationService collaborationService;
 
     @GetMapping
     @Operation(summary = "List issues (filterable, paginated)")

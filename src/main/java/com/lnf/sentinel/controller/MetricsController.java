@@ -1,8 +1,8 @@
 package com.lnf.sentinel.controller;
 
 
-import com.lnf.dto.sentinel.MetricsSummaryDto;
 
+import com.lnf.dto.sentinel.MetricSummaryDto;
 import com.lnf.sentinel.service.MetricsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class MetricsController {
     private final MetricsService metricsService;
 
     @GetMapping("/summary")
-    public MetricsSummaryDto summary() {
+    public MetricSummaryDto summary() {
         return metricsService.summary();
     }
 }
