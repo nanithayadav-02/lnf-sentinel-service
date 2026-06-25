@@ -4,8 +4,6 @@ import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.enums.*;
 
-import java.util.UUID;
-
 public class IssueConverter {
 
     private IssueConverter() {
@@ -22,11 +20,7 @@ public class IssueConverter {
                 .issueKey(entity.getIssueKey())
                 .summary(entity.getSummary())
                 .description(entity.getDescription())
-                .tenantCode(
-                        entity.getTenantCode() != null
-                                ? entity.getTenantCode().toString()
-                                : null
-                )
+                .tenantCode(entity.getTenantCode())
                 .tenantName(entity.getTenantName())
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .severity(entity.getSeverity() != null ? entity.getSeverity().name() : null)
@@ -59,8 +53,8 @@ public class IssueConverter {
         issue.setSummary(transport.getSummary());
         issue.setDescription(transport.getDescription());
 
-        if (transport.getTenantCode() != null && !transport.getTenantCode().isBlank()) {
-            issue.setTenantCode(UUID.fromString(transport.getTenantCode()));
+        if (transport.getTenantCode() != null) {
+            issue.setTenantCode(transport.getTenantCode());
         }
 
         issue.setTenantName(transport.getTenantName());

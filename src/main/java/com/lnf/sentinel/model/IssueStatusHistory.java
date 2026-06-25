@@ -27,7 +27,7 @@ public class IssueStatusHistory extends AuditableEntity {
     @Column(name = "to_status", length = 20)
     private IssueStatus toStatus;
 
-    @Column(length = 500)
+    @Column(name="note",length = 500)
     private String notes;
 
 }

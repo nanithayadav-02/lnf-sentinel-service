@@ -1,7 +1,7 @@
 package com.lnf.sentinel.tenant;
 
-import com.lnf.sentinel.repository.TenantRepository;
 import com.lnf.sentinel.model.Tenant;
+import com.lnf.sentinel.repository.TenantRepository;
 import com.lnf.tenant.core.context.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,16 +33,18 @@ public class TenantFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain chain)
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain chain)
             throws ServletException, IOException {
 
         try {
+
             UUID tenantId = resolveTenant(request);
 
             if (tenantId != null) {
-                TenantContext.setCurrentTenant(String.valueOf(tenantId));
+                TenantContext.setCurrentTenant(tenantId.toString());
             }
 
             chain.doFilter(request, response);
@@ -53,6 +55,7 @@ public class TenantFilter extends OncePerRequestFilter {
     }
 
     private UUID resolveTenant(HttpServletRequest request) {
+
         String header = request.getHeader(TENANT_HEADER);
 
         if (StringUtils.hasText(header)) {
@@ -64,24 +67,30 @@ public class TenantFilter extends OncePerRequestFilter {
 
     private UUID resolveFromHeader(String header) {
 
-        // Case 1: UUID sent directly
         try {
-            UUID id = UUID.fromString(header);
 
-            return tenantRepository.existsById(id) ? id : null;
+            UUID uuid = UUID.fromString(header);
 
-        } catch (IllegalArgumentException ignored) {
+            // Header contains Tenant ID
+            if (tenantRepository.existsById(uuid)) {
+                return uuid;
+            }
 
+            // Header contains Tenant Code
+            return tenantRepository.findByTenantCode(header)
+                    .map(Tenant::getId)
+                    .orElse(null);
+
+        } catch (IllegalArgumentException e) {
+
+            return null;
         }
-
-        // Case 2: tenant code
-        return tenantRepository.findByTenantCode(header)
-                .map(Tenant::getId)
-                .orElse(null);
     }
 
     private UUID resolveFromJwt() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
 
@@ -89,7 +98,7 @@ public class TenantFilter extends OncePerRequestFilter {
 
             if (claim != null) {
                 try {
-                    return UUID.fromString(String.valueOf(claim));
+                    return UUID.fromString(claim.toString());
                 } catch (IllegalArgumentException ignored) {
                     return null;
                 }

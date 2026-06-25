@@ -7,8 +7,7 @@ import com.lnf.sentinel.converter.IssueConverter;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.IssueStatusHistory;
 import com.lnf.sentinel.model.Tenant;
-import com.lnf.sentinel.model.enums.IssueStatus;
-import com.lnf.sentinel.model.enums.Severity;
+import com.lnf.sentinel.model.enums.*;
 import com.lnf.sentinel.repository.IssueRepository;
 import com.lnf.sentinel.repository.IssueStatusHistoryRepository;
 import com.lnf.sentinel.repository.TenantRepository;
@@ -44,68 +43,102 @@ public class IssueService {
     @Transactional
     public void create(IssueDto resource) {
 
+
+        resolveTenant(resource);
+
+        if (resource.getTenantCode() == null) {
+            throw new LnFException("Tenant Id is required");
+        }
+
         Issue issue = new Issue();
 
         Long seq = issueRepository.nextIssueKeyNumber();
-
         issue.setIssueKey("ISSUE-" + seq);
 
         issue.setSummary(resource.getSummary());
         issue.setDescription(resource.getDescription());
 
-        issue.setTenantName(
-                resource.getTenantName() != null
-                        ? resource.getTenantName()
-                        : "Acme Corporation"
-        );
+        issue.setTenantCode(resource.getTenantCode());
+        issue.setTenantName(resource.getTenantName());
 
-        // TEMPORARY TEST VALUES
-        issue.setTenantCode(
-                UUID.fromString("11111111-1111-1111-1111-111111111111")
-        );
-
-        issue.setAssigneeId(
-                resource.getAssigneeId() != null
-                        ? resource.getAssigneeId()
-                        : UUID.fromString("7a1f8c2e-9d44-4d5f-b2c3-123456789abc")
-        );
+        issue.setAssigneeId(resource.getAssigneeId());
+        issue.setAssignee(resource.getAssignee());
 
         issue.setReportedBy(resource.getReportedBy());
-
         issue.setAffectedService(resource.getAffectedService());
-        issue.setAssignee(resource.getAssignee());
+
+        if (resource.getSeverity() != null) {
+            issue.setSeverity(Severity.valueOf(resource.getSeverity()));
+        }
+
+        if (resource.getPriority() != null) {
+            issue.setPriority(Priority.valueOf(resource.getPriority()));
+        }
+
+        if (resource.getCategory() != null) {
+            issue.setCategory(Category.valueOf(resource.getCategory()));
+        }
+
+        if (resource.getEnvironment() != null) {
+            issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
+        }
 
         issue.setStatus(IssueStatus.NEW);
 
-        Date detectedAt = new Date();
+        Date detectedAt = resource.getDetectedAt() != null
+                ? resource.getDetectedAt()
+                : new Date();
+
         issue.setDetectedAt(detectedAt);
 
-        issue.setSlaDueAt(
-                Date.from(
-                        detectedAt.toInstant()
-                                .plus(issue.getSeverity().slaTarget())
-                )
-        );
+        if (resource.getSlaDueAt() != null) {
+            issue.setSlaDueAt(resource.getSlaDueAt());
+        } else if (issue.getSeverity() != null) {
+            issue.setSlaDueAt(
+                    Date.from(
+                            detectedAt.toInstant()
+                                    .plus(issue.getSeverity().slaTarget())
+                    )
+            );
+        }
 
         Issue saved = issueRepository.saveAndFlush(issue);
 
         log.info("Issue saved successfully. ID={}", saved.getId());
+
     }
 
+
     private void resolveTenant(IssueDto resource) {
+
         if (tenantEnabled) {
+
             String tenantName = tenantFilterResolver.resolvePrefix();
+
             Tenant tenant = searchForTenantName(tenantName);
-            resource.setTenantName(tenantName);
+
+            resource.setTenantName(tenant.getName());
             resource.setTenantCode(tenant.getTenantCode());
+
         } else {
-            resource.setTenantName(resource.getTenantName());
-            resource.setTenantCode(resource.getTenantCode());
+
+            if (resource.getTenantCode() == null) {
+                throw new LnFException("Tenant Id is required");
+            }
         }
     }
 
+    private Tenant searchForTenantName(String tenantName) {
+
+        return tenantRepository.findByName(tenantName)
+                .orElseThrow(() ->
+                        new LnFEntityNotFoundException(
+                                "Tenant with name [" + tenantName + "] does not exist"
+                        ));
+    }
+
     @Transactional(readOnly = true)
-    public Page<IssueDto> list(String tenantName, String tenantCode, IssueStatus status, Severity severity,
+    public Page<IssueDto> list(String tenantName, UUID tenantCode, IssueStatus status, Severity severity,
                                UUID assigneeId, String search, Pageable pageable) {
         Specification<Issue> spec = Specification
                 .where(tenantName(tenantName))
@@ -165,14 +198,18 @@ public class IssueService {
         historyRepository.save(h);
     }
 
-    private Tenant searchForTenantName(String tenantCode) {
-        return tenantRepository.findByTenantCode(tenantCode).orElseThrow(() ->
-                new LnFEntityNotFoundException("Tenant with name [%s] does not exist".formatted(tenantCode)));
-    }
+
 
     private Issue searchForIssueId(UUID id) {
         return issueRepository.findById(id)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + id));
+    }
+
+    public static Specification<Issue> tenantCode(UUID tenantCode) {
+        return (root, query, cb) -> {
+            if (tenantCode == null) return null;
+            return cb.equal(root.get("tenantCode"), tenantCode);
+        };
     }
 
 }

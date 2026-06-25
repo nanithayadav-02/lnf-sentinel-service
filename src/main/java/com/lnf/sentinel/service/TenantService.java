@@ -23,30 +23,55 @@ public class TenantService {
 
     @Transactional
     public TenantDto create(TenantDto req) {
+
         if (tenantRepository.existsByTenantCode(req.getTenantCode())) {
-            throw new LnFBadRequestException("Tenant code already exists: " + req.getTenantCode());
+            throw new LnFBadRequestException(
+                    "Tenant code already exists: " + req.getTenantCode()
+            );
         }
-        Tenant t = new Tenant();
-        t.setTenantCode(req.getTenantCode());
-        t.setName(req.getName());
-        t.setStatus(req.getStatus() != null ? TenantStatus.valueOf(req.getStatus()): TenantStatus.ACTIVE);
-        t.setSupportTier(req.getSupportTier() != null ?  SupportTier.valueOf(req.getSupportTier()) : SupportTier.STANDARD);
-        t.setRegion(req.getRegion());
-        t.setProductionUrl(req.getProductionUrl());
-        t.setPrimaryContactName(req.getPrimaryContactName());
-        t.setPrimaryContactEmail(req.getPrimaryContactEmail());
-        return TenantConverter.toTransportModel(tenantRepository.save(t));
+
+        Tenant tenant = new Tenant();
+
+        tenant.setTenantCode(req.getTenantCode());
+        tenant.setName(req.getName());
+
+        tenant.setStatus(
+                req.getStatus() != null
+                        ? TenantStatus.valueOf(req.getStatus())
+                        : TenantStatus.ACTIVE
+        );
+
+        tenant.setSupportTier(
+                req.getSupportTier() != null
+                        ? SupportTier.valueOf(req.getSupportTier())
+                        : SupportTier.STANDARD
+        );
+
+        tenant.setRegion(req.getRegion());
+        tenant.setProductionUrl(req.getProductionUrl());
+        tenant.setPrimaryContactName(req.getPrimaryContactName());
+        tenant.setPrimaryContactEmail(req.getPrimaryContactEmail());
+
+        return TenantConverter.toTransportModel(
+                tenantRepository.save(tenant)
+        );
     }
 
     @Transactional(readOnly = true)
     public List<TenantDto> list() {
-        return tenantRepository.findAll().stream().map(TenantConverter::toTransportModel).toList();
+        return tenantRepository.findAll()
+                .stream()
+                .map(TenantConverter::toTransportModel)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public TenantDto get(UUID id) {
         return tenantRepository.findById(id)
                 .map(TenantConverter::toTransportModel)
-                .orElseThrow(() -> new LnFEntityNotFoundException("Tenant not found: " + id));
+                .orElseThrow(() ->
+                        new LnFEntityNotFoundException(
+                                "Tenant not found: " + id
+                        ));
     }
 }
