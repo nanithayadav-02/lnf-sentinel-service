@@ -4,6 +4,8 @@ import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.enums.*;
 
+import java.util.UUID;
+
 public class IssueConverter {
 
     private IssueConverter() {
@@ -54,9 +56,8 @@ public class IssueConverter {
         issue.setDescription(transport.getDescription());
 
         if (transport.getTenantCode() != null) {
-            issue.setTenantCode(transport.getTenantCode());
+            issue.setTenantCode(String.valueOf(transport.getTenantCode()));
         }
-
         issue.setTenantName(transport.getTenantName());
 
         if (transport.getStatus() != null) {
@@ -66,19 +67,15 @@ public class IssueConverter {
         if (transport.getSeverity() != null) {
             issue.setSeverity(Severity.valueOf(transport.getSeverity()));
         }
-
         if (transport.getPriority() != null) {
             issue.setPriority(Priority.valueOf(transport.getPriority()));
         }
-
         if (transport.getCategory() != null) {
             issue.setCategory(Category.valueOf(transport.getCategory()));
         }
-
         if (transport.getEnvironment() != null) {
             issue.setEnvironment(Environment.valueOf(transport.getEnvironment()));
         }
-
         issue.setAssigneeId(transport.getAssigneeId());
         issue.setAssignee(transport.getAssignee());
         issue.setReportedBy(transport.getReportedBy());

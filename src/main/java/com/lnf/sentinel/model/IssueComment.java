@@ -23,9 +23,6 @@ public class IssueComment extends AuditableEntity {
     @Column(name = "user_id")
     private UUID userId;
 
-    @Column(name = "user_name")
-    private UUID userName;
-
     @Column(name = "tenant_name")
     private String tenantName;
 
@@ -36,5 +33,5 @@ public class IssueComment extends AuditableEntity {
     private boolean internal = true;
 
     @Column(name="author_id")
-     private String authorId;
+    private UUID authorId;
 }

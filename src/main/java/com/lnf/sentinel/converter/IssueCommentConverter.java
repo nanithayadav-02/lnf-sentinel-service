@@ -3,6 +3,10 @@ package com.lnf.sentinel.converter;
 import com.lnf.dto.sentinel.IssueCommentDto;
 import com.lnf.sentinel.model.IssueComment;
 
+import java.util.UUID;
+
+import static org.springframework.data.redis.connection.ReactiveStreamCommands.AddStreamRecord.body;
+
 public class IssueCommentConverter {
 
     private IssueCommentConverter() {

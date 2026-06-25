@@ -43,85 +43,43 @@ public class IssueService {
     @Transactional
     public void create(IssueDto resource) {
 
-
         resolveTenant(resource);
-
         if (resource.getTenantCode() == null) {
             throw new LnFException("Tenant Id is required");
         }
 
         Issue issue = new Issue();
-
         Long seq = issueRepository.nextIssueKeyNumber();
         issue.setIssueKey("ISSUE-" + seq);
-
         issue.setSummary(resource.getSummary());
         issue.setDescription(resource.getDescription());
-
-        issue.setTenantCode(resource.getTenantCode());
+        issue.setTenantCode(String.valueOf(resource.getTenantCode()));
         issue.setTenantName(resource.getTenantName());
-
         issue.setAssigneeId(resource.getAssigneeId());
         issue.setAssignee(resource.getAssignee());
-
         issue.setReportedBy(resource.getReportedBy());
         issue.setAffectedService(resource.getAffectedService());
-
-        if (resource.getSeverity() != null) {
-            issue.setSeverity(Severity.valueOf(resource.getSeverity()));
-        }
-
-        if (resource.getPriority() != null) {
-            issue.setPriority(Priority.valueOf(resource.getPriority()));
-        }
-
-        if (resource.getCategory() != null) {
-            issue.setCategory(Category.valueOf(resource.getCategory()));
-        }
-
-        if (resource.getEnvironment() != null) {
-            issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
-        }
-
+        issue.setSeverity(Severity.valueOf(resource.getSeverity()));
+        issue.setPriority(Priority.valueOf(resource.getPriority()));
+        issue.setCategory(Category.valueOf(resource.getCategory()));
+        issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
         issue.setStatus(IssueStatus.NEW);
-
-        Date detectedAt = resource.getDetectedAt() != null
-                ? resource.getDetectedAt()
-                : new Date();
-
-        issue.setDetectedAt(detectedAt);
-
-        if (resource.getSlaDueAt() != null) {
-            issue.setSlaDueAt(resource.getSlaDueAt());
-        } else if (issue.getSeverity() != null) {
-            issue.setSlaDueAt(
-                    Date.from(
-                            detectedAt.toInstant()
-                                    .plus(issue.getSeverity().slaTarget())
-                    )
-            );
-        }
-
+        issue.setDetectedAt(resource.getDetectedAt());
+        issue.setSlaDueAt(resource.getSlaDueAt());
         Issue saved = issueRepository.saveAndFlush(issue);
-
         log.info("Issue saved successfully. ID={}", saved.getId());
-
     }
-
 
     private void resolveTenant(IssueDto resource) {
 
         if (tenantEnabled) {
-
             String tenantName = tenantFilterResolver.resolvePrefix();
 
             Tenant tenant = searchForTenantName(tenantName);
-
             resource.setTenantName(tenant.getName());
             resource.setTenantCode(tenant.getTenantCode());
 
         } else {
-
             if (resource.getTenantCode() == null) {
                 throw new LnFException("Tenant Id is required");
             }
@@ -138,11 +96,11 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public Page<IssueDto> list(String tenantName, UUID tenantCode, IssueStatus status, Severity severity,
+    public Page<IssueDto> list(String tenantName, String tenantCode, IssueStatus status, Severity severity,
                                UUID assigneeId, String search, Pageable pageable) {
         Specification<Issue> spec = Specification
                 .where(tenantName(tenantName))
-                .and(tenantCode(tenantCode))
+                .and(IssueSpecifications.tenantCode(tenantCode))
                 .and(status(status))
                 .and(severity(severity))
                 .and(assigneeId(assigneeId))
