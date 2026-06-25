@@ -34,5 +34,4 @@ public class User extends AuditableEntity {
 
     @Column(nullable = false)
     private UUID tenantId;
-
 }

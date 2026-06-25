@@ -16,7 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Tenant extends AuditableEntity {
 
-
     @Column(name = "tenant_code", nullable = false, unique = true, length = 40)
     private String tenantCode;
 

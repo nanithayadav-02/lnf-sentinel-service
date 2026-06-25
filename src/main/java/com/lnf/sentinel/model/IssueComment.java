@@ -26,7 +26,7 @@ public class IssueComment extends AuditableEntity {
     @Column(name = "user_name")
     private UUID userName;
 
-    @Column(name = "tenant_name") //if it is external
+    @Column(name = "tenant_name")
     private String tenantName;
 
     @Column(nullable = false, columnDefinition = "text")

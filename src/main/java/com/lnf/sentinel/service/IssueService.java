@@ -43,19 +43,53 @@ public class IssueService {
 
     @Transactional
     public void create(IssueDto resource) {
-        resolveTenant(resource);
+
         Issue issue = new Issue();
-        Long seq=issueRepository.nextIssueKeyNumber();
-        issue.setIssueKey("ISSUE-"+seq);
-        //issue.setIssueKey(KEY_PREFIX + issueRepository.nextIssueKeyNumber());
+
+        Long seq = issueRepository.nextIssueKeyNumber();
+
+        issue.setIssueKey("ISSUE-" + seq);
+
+        issue.setSummary(resource.getSummary());
+        issue.setDescription(resource.getDescription());
+
+        issue.setTenantName(
+                resource.getTenantName() != null
+                        ? resource.getTenantName()
+                        : "Acme Corporation"
+        );
+
+        // TEMPORARY TEST VALUES
+        issue.setTenantCode(
+                UUID.fromString("11111111-1111-1111-1111-111111111111")
+        );
+
+        issue.setAssigneeId(
+                resource.getAssigneeId() != null
+                        ? resource.getAssigneeId()
+                        : UUID.fromString("7a1f8c2e-9d44-4d5f-b2c3-123456789abc")
+        );
+
+        issue.setReportedBy(resource.getReportedBy());
+
+        issue.setAffectedService(resource.getAffectedService());
+        issue.setAssignee(resource.getAssignee());
+
         issue.setStatus(IssueStatus.NEW);
 
-        Date detectedAt = resource.getDetectedAt() != null ? resource.getDetectedAt() : new Date();
+        Date detectedAt = new Date();
         issue.setDetectedAt(detectedAt);
-        issue.setSlaDueAt(Date.from(detectedAt.toInstant().plus(issue.getSeverity().slaTarget())));
 
-        Issue saved = issueRepository.save(issue);
-        recordHistory(saved, IssueStatus.NEW, IssueStatus.NEW, "IssueCreated");
+        issue.setSlaDueAt(
+                Date.from(
+                        detectedAt.toInstant()
+                                .plus(issue.getSeverity().slaTarget())
+                )
+        );
+
+        Issue saved = issueRepository.saveAndFlush(issue);
+
+        log.info("Issue saved successfully. ID={}", saved.getId());
     }
 
     private void resolveTenant(IssueDto resource) {
@@ -63,7 +97,7 @@ public class IssueService {
             String tenantName = tenantFilterResolver.resolvePrefix();
             Tenant tenant = searchForTenantName(tenantName);
             resource.setTenantName(tenantName);
-            resource.setTenantCode(UUID.fromString(tenant.getTenantCode()));
+            resource.setTenantCode(tenant.getTenantCode());
         } else {
             resource.setTenantName(resource.getTenantName());
             resource.setTenantCode(resource.getTenantCode());

@@ -25,7 +25,6 @@ public class IssueLink extends AuditableEntity {
     private UUID targetIssueId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "linkType")
+    @Column(name = "link_type", nullable = false)
     private LinkType linkType;
-
 }

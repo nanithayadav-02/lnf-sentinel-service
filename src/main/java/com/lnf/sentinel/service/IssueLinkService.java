@@ -24,17 +24,30 @@ public class IssueLinkService {
 
     @Transactional
     public void createLink(UUID sourceIssueId, IssueLinkDto resource) {
+
         searchForIssueId(sourceIssueId);
+
         if (sourceIssueId.equals(resource.getTargetIssueId())) {
             throw new LnFBadRequestException("An issue cannot be linked to itself");
         }
-        // Target must exist and be visible to the current tenant.
+
         searchForIssueId(resource.getTargetIssueId());
+
+        LinkType linkType = LinkType.valueOf(resource.getLinkType());
+
         if (repository.existsBySourceIssueIdAndTargetIssueIdAndLinkType(
-                sourceIssueId, resource.getTargetIssueId(), LinkType.valueOf(resource.getLinkType()))) {
+                sourceIssueId,
+                resource.getTargetIssueId(),
+                linkType)) {
+
             throw new LnFBadRequestException("That link already exists");
         }
-        IssueLinkConverter.toEntity(resource, new IssueLink());
+
+        IssueLink entity = IssueLinkConverter.toEntity(resource, new IssueLink());
+
+        entity.setSourceIssueId(sourceIssueId);
+
+        repository.save(entity);   // <-- MISSING LINE
     }
 
     @Transactional(readOnly = true)

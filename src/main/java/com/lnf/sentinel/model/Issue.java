@@ -65,7 +65,7 @@ public class Issue extends AuditableEntity {
     private Resolution resolution;
 
     @Column(name = "reported_by")
-    private String reportedBy;
+    private String  reportedBy;
 
     @Column(name = "detected_at")
     private Date detectedAt;

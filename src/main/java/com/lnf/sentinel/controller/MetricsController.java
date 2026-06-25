@@ -1,7 +1,5 @@
 package com.lnf.sentinel.controller;
 
-
-
 import com.lnf.dto.sentinel.MetricSummaryDto;
 import com.lnf.sentinel.service.MetricsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
