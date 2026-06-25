@@ -22,22 +22,11 @@ public class IssueCommentService {
     private final IssueRepository issueRepository;
 
 
-    @Transactional
-    public IssueCommentDto addComment(UUID issueId, IssueCommentDto resource) {
-
-        Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() ->
-                        new LnFEntityNotFoundException("Issue not found: " + issueId));
-
-        IssueComment comment = new IssueComment();
-
-        IssueCommentConverter.toEntityModel(comment, resource);
-
-        comment.setIssueId(issueId);
-
-        IssueComment saved = repository.save(comment);
-
-        return IssueCommentConverter.toTransportModel(saved);
+    public void addComment(UUID issueId, IssueCommentDto resource) {
+       Issue issue= searchForIssueId(issueId);
+       IssueComment comment= IssueCommentConverter.toEntityModel(new IssueComment(), resource);
+      comment.setIssueId(issueId);
+        repository.save(comment);
     }
 
     @Transactional(readOnly = true)
@@ -47,8 +36,8 @@ public class IssueCommentService {
                 .stream().map(IssueCommentConverter::toTransportModel).toList();
     }
 
-    private void searchForIssueId(UUID id) {
-        issueRepository.findById(id)
+    private Issue searchForIssueId(UUID id) {
+        return issueRepository.findById(id)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + id));
     }
 

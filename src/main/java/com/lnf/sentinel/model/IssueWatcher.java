@@ -23,7 +23,7 @@ public class IssueWatcher extends AuditableEntity {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "user_name")
-    private String userName;
+    @Column(name = "created_by")
+    private String createdBy;
 
 }

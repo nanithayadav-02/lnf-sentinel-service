@@ -18,21 +18,12 @@ public class TenantFilterConfig {
 
     @Value("${lnf.tenant.databaseName:defaultdb}")
     private String databaseName;
+    private static final Long UNRESOLVABLE = -1L;
 
     @Bean
-    public FilterRegistrationBean<TenantFilter> tenantFilterRegistration() {
-
-        FilterRegistrationBean<TenantFilter> registrationBean =
-                new FilterRegistrationBean<>();
-
-        registrationBean.setFilter(
-                new TenantFilter(
-                        tenantEnabled,
-                        defaultTenantId,
-                        databaseName
-                )
-        );
-
+    public FilterRegistrationBean<TenantFilter> tenantFilterConfig() {
+        FilterRegistrationBean<TenantFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new TenantFilter(tenantEnabled, defaultTenantId, databaseName));
         registrationBean.addUrlPatterns("/*");
         registrationBean.setOrder(1);
 

@@ -14,6 +14,8 @@ public class IssueCommentConverter {
         return IssueCommentDto.builder()
                 .id(entity.getId())
                 .issueId(entity.getIssueId())
+                .userId(entity.getUserId())
+                .authorId(entity.getAuthorId())
                 .body(entity.getBody())
                 .internal(entity.isInternal())
                 .build();
@@ -22,7 +24,9 @@ public class IssueCommentConverter {
     public static IssueComment toEntityModel(IssueComment entity, IssueCommentDto transport) {
         if (entity == null || transport == null) return null;
         entity.setIssueId(transport.getIssueId());
+        entity.setUserId(transport.getUserId());
         entity.setBody(transport.getBody());
+        entity.setAuthorId(transport.getAuthorId());
         entity.setInternal(transport.isInternal());
         return entity;
     }

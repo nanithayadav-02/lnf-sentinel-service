@@ -35,4 +35,6 @@ public class IssueComment extends AuditableEntity {
     @Column(nullable = false)
     private boolean internal = true;
 
+    @Column(name="author_id")
+     private String authorId;
 }
