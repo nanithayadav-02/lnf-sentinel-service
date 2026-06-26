@@ -16,7 +16,7 @@
 
 package com.lnf.sentinel.config;
 
-import com.lnf.tenant.core.context.TenantContext;
+//import com.lnf.tenant.core.context.TenantContext;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -76,7 +76,7 @@ public class WebClientConfiguration {
                 return Mono.just(clientRequest);
             }
 
-            String currentTenant = TenantContext.getCurrentTenant();
+            String currentTenant =null;
 
             String tenantPrefix = (currentTenant != null && currentTenant.contains("-"))
                     ? currentTenant.split("-")[0]
