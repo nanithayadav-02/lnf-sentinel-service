@@ -1,5 +1,6 @@
 package com.lnf.sentinel.service;
 
+import com.lnf.exception.LnFException;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.enums.IssueStatus;
 import com.lnf.sentinel.model.enums.Severity;
@@ -19,11 +20,6 @@ public final class IssueSpecifications {
     public static Specification<Issue> tenantName(String tenantName) {
         return (root, query, cb) ->
                 tenantName == null ? cb.conjunction() : cb.equal(root.get("tenantName"), tenantName);
-    }
-
-    public static Specification<Issue> tenantCode(String tenantCode) {
-        return (root, query, cb) ->
-                tenantCode == null ? cb.conjunction() : cb.equal(root.get("tenantCode"), tenantCode);
     }
 
     public static Specification<Issue> status(IssueStatus status) {
@@ -49,15 +45,11 @@ public final class IssueSpecifications {
             String like = "%" + term.toLowerCase() + "%";
             List<Predicate> ors = new ArrayList<>();
             ors.add(cb.like(cb.lower(root.get("issueKey")), like));
-            ors.add(cb.like(cb.lower(root.get("title")), like));
             ors.add(cb.like(cb.lower(root.get("description")), like));
             ors.add(cb.like(cb.lower(root.get("affectedService")), like));
             ors.add(cb.like(cb.lower(root.get("status")), like));
             ors.add(cb.like(cb.lower(root.get("severity")), like));
             ors.add(cb.like(cb.lower(root.get("summary")), like));
-            ors.add(cb.like(cb.lower(root.get("tenantCode")), like));
-            ors.add(cb.like(cb.lower(root.get("tenantName")), like));
-
             return cb.or(ors.toArray(new Predicate[0]));
         };
     }

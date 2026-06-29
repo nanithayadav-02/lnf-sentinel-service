@@ -16,15 +16,15 @@ public class IssueCommentController {
 
     private final IssueCommentService service;
 
-    @GetMapping("/comments/{id}")
-    public List<IssueCommentDto> listComments(@PathVariable UUID id) {
-        return service.listComments(id);
+    @GetMapping("/comments/{issueId}")
+    public List<IssueCommentDto> listComments(@PathVariable UUID issueId) {
+        return service.listComments(issueId);
     }
 
-    @PostMapping("/comments/{id}")
-    public void addComment(@PathVariable UUID id,
+    @PostMapping("/comments/{issueId}")
+    public void addComment(@PathVariable UUID issueId,
                            @Valid @RequestBody IssueCommentDto req) {
-        service.addComment(id, req);
+        service.addComment(issueId, req);
     }
 
 }

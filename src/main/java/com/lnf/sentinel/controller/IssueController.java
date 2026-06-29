@@ -29,13 +29,13 @@ public class IssueController {
     @GetMapping
     @Operation(summary = "List issues (filterable, paginated)")
     public Page<IssueDto> list(@RequestParam(required = false) String tenantName,
-                               @RequestParam(required = false) String tenantCode,
+                               @RequestParam(required = false) UUID tenantId,
                                @RequestParam(required = false) IssueStatus status,
                                @RequestParam(required = false) Severity severity,
                                @RequestParam(required = false) UUID assigneeId,
                                @RequestParam(required = false) String search,
                                Pageable pageable) {
-        return issueService.list(tenantName, tenantCode, status, severity, assigneeId, search, pageable);
+        return issueService.list(tenantName, tenantId, status, severity, assigneeId, search, pageable);
     }
 
     @PostMapping

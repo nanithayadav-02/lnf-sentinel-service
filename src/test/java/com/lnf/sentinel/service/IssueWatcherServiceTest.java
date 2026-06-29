@@ -36,51 +36,53 @@ class IssueWatcherServiceTest {
     @Nested
     class AddWatcherTests {
 
-        @Test
-        void shouldAddWatcherWhenNotAlreadyWatching() {
-            // Arrange
-            UUID issueId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
+             @Test
+             void shouldAddWatcherWhenNotAlreadyWatching() {
+                 // Arrange
+                 UUID issueId = UUID.randomUUID();
+                 UUID userId = UUID.randomUUID();
+                 String createdBy="LNf";
 
-            when(issueRepository.findById(issueId)).thenReturn(Optional.of(new Issue()));
-            when(repository.findByIssueIdAndUserId(issueId, userId)).thenReturn(Optional.empty());
+                 when(issueRepository.findById(issueId)).thenReturn(Optional.of(new Issue()));
+                 when(repository.findByIssueIdAndUserIdAndCreatedBy(issueId, userId,createdBy)).thenReturn(Optional.empty());
 
-            // Mocking save behavior since orElseGet falls back to repository.save()
-            when(repository.save(any(IssueWatcher.class))).thenAnswer(invocation -> invocation.getArgument(0));
+                 // Mocking save behavior since orElseGet falls back to repository.save()
+                 when(repository.save(any(IssueWatcher.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            // Act & Assert
-            assertDoesNotThrow(() -> service.addWatcher(issueId, userId));
-            verify(repository, times(1)).save(any(IssueWatcher.class));
-        }
+                 // Act & Assert
+                 assertDoesNotThrow(() -> service.addWatcher(issueId, userId,createdBy));
+                 verify(repository, times(1)).save(any(IssueWatcher.class));
+             }
 
-        @Test
-        void shouldNotDuplicateWatcherWhenAlreadyWatching() {
-            // Arrange
-            UUID issueId = UUID.randomUUID();
-            UUID userId = UUID.randomUUID();
-            IssueWatcher existingWatcher = new IssueWatcher();
+             @Test
+             void shouldNotDuplicateWatcherWhenAlreadyWatching() {
+                 // Arrange
+                 UUID issueId = UUID.randomUUID();
+                 UUID userId = UUID.randomUUID();
+                 String createdBy="LNF";
+                 IssueWatcher existingWatcher = new IssueWatcher();
 
-            when(issueRepository.findById(issueId)).thenReturn(Optional.of(new Issue()));
-            when(repository.findByIssueIdAndUserId(issueId, userId)).thenReturn(Optional.of(existingWatcher));
+                 when(issueRepository.findById(issueId)).thenReturn(Optional.of(new Issue()));
+                 when(repository.findByIssueIdAndUserIdAndCreatedBy(issueId, userId,createdBy)).thenReturn(Optional.of(existingWatcher));
 
-            // Act
-            service.addWatcher(issueId, userId);
+                 // Act
+                 service.addWatcher(issueId, userId,createdBy);
 
-            // Assert - verify save was never executed because it already exists
-            verify(repository, never()).save(any(IssueWatcher.class));
-        }
-
+                 // Assert - verify save was never executed because it already exists
+                 verify(repository, never()).save(any(IssueWatcher.class));
+             }
         @Test
         void shouldThrowExceptionWhenIssueDoesNotExist() {
 
             UUID issueId = UUID.randomUUID();
             UUID userId = UUID.randomUUID();
+            String createdBy="LNf";
 
             when(issueRepository.findById(issueId)).thenReturn(Optional.empty());
 
 
             LnFEntityNotFoundException exception = assertThrows(LnFEntityNotFoundException.class, () ->
-                    service.addWatcher(issueId, userId)
+                    service.addWatcher(issueId, userId,createdBy)
             );
             assertTrue(exception.getMessage().contains("Issue not found:"));
             verify(repository, never()).findByIssueIdAndUserId(any(), any());

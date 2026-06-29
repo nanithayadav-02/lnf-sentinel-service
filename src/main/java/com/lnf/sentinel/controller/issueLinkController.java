@@ -17,15 +17,15 @@ public class issueLinkController {
 
     private final IssueLinkService service;
 
-    @GetMapping("/links/{id}")
-    public List<IssueLinkDto> listLinks(@PathVariable UUID id) {
-        return service.findByIssueId(id);
+    @GetMapping("/links/{issueId}")
+    public List<IssueLinkDto> listLinks(@PathVariable UUID issueId) {
+        return service.findByIssueId(issueId);
     }
 
-    @PostMapping("/links/{id}")
-    public void createLink(@PathVariable UUID id,
+    @PostMapping("/links/{issueId}")
+    public void createLink(@PathVariable UUID issueId,
                            @Valid @RequestBody IssueLinkDto resource) {
-        service.createLink(id, resource);
+        service.createLink(issueId, resource);
     }
 
     @DeleteMapping("/links/{linkId}")

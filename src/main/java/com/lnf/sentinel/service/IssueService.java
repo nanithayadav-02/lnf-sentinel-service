@@ -44,7 +44,7 @@ public class IssueService {
     public void create(IssueDto resource) {
 
         resolveTenant(resource);
-        if (resource.getTenantCode() == null) {
+        if (resource.getTenantId() == null) {
             throw new LnFException("Tenant Id is required");
         }
 
@@ -53,7 +53,7 @@ public class IssueService {
         issue.setIssueKey("ISSUE-" + seq);
         issue.setSummary(resource.getSummary());
         issue.setDescription(resource.getDescription());
-        issue.setTenantCode(String.valueOf(resource.getTenantCode()));
+        issue.setTenantId(resource.getTenantId());
         issue.setTenantName(resource.getTenantName());
         issue.setAssigneeId(resource.getAssigneeId());
         issue.setAssignee(resource.getAssignee());
@@ -77,10 +77,10 @@ public class IssueService {
 
             Tenant tenant = searchForTenantName(tenantName);
             resource.setTenantName(tenant.getName());
-            resource.setTenantCode(tenant.getTenantCode());
+            resource.setTenantId(tenant.getId());
 
         } else {
-            if (resource.getTenantCode() == null) {
+            if (resource.getTenantId() == null) {
                 throw new LnFException("Tenant Id is required");
             }
         }
@@ -96,11 +96,11 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public Page<IssueDto> list(String tenantName, String tenantCode, IssueStatus status, Severity severity,
+    public Page<IssueDto> list(String tenantName, UUID tenantId, IssueStatus status, Severity severity,
                                UUID assigneeId, String search, Pageable pageable) {
         Specification<Issue> spec = Specification
                 .where(tenantName(tenantName))
-                .and(IssueSpecifications.tenantCode(tenantCode))
+                .and(tenantId(tenantId))
                 .and(status(status))
                 .and(severity(severity))
                 .and(assigneeId(assigneeId))
@@ -163,10 +163,10 @@ public class IssueService {
                 .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + id));
     }
 
-    public static Specification<Issue> tenantCode(UUID tenantCode) {
+    public static Specification<Issue> tenantId(UUID tenantId) {
         return (root, query, cb) -> {
-            if (tenantCode == null) return null;
-            return cb.equal(root.get("tenantCode"), tenantCode);
+            if (tenantId == null) return null;
+            return cb.equal(root.get("tenantId"), tenantId);
         };
     }
 

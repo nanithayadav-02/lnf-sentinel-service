@@ -24,8 +24,8 @@ public class IssueWatcherController {
 
     @PostMapping("/watchers")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addWatcher(@RequestParam UUID issueId, @RequestParam UUID userId) {
-        service.addWatcher(issueId, userId);
+    public void addWatcher(@RequestParam UUID issueId, @RequestParam UUID userId,@RequestParam String createdBy) {
+        service.addWatcher(issueId, userId,createdBy);
     }
 
     @DeleteMapping("/watchers")
