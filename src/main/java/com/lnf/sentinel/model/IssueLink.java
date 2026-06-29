@@ -27,4 +27,6 @@ public class IssueLink extends AuditableEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "link_type", nullable = false)
     private LinkType linkType;
+
+
 }

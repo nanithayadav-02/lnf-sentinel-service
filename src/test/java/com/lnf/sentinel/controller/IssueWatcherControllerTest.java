@@ -66,18 +66,21 @@ class IssueWatcherControllerTest {
         UUID issueId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
 
+        String createdBY="siva";
+
         doNothing().when(service)
-                .addWatcher(issueId, userId);
+                .addWatcher(issueId, userId,createdBY);
 
         mockMvc.perform(
                         post("/sentinel/issues/watchers")
                                 .param("issueId", issueId.toString())
                                 .param("userId", userId.toString())
+                                .param("createdBy",createdBY)
                 )
                 .andExpect(status().isCreated());
 
         Mockito.verify(service)
-                .addWatcher(issueId, userId);
+                .addWatcher(issueId, userId,createdBY);
     }
 
     @Test

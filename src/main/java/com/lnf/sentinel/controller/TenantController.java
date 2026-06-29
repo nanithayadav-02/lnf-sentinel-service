@@ -32,9 +32,9 @@ public class TenantController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/{id}")
-    public TenantDto get(@PathVariable UUID id) {
-        return tenantService.get(id);
+    @GetMapping("/{tenantId}")
+    public TenantDto get(@PathVariable UUID tenantId) {
+        return tenantService.get(tenantId);
     }
 
 }

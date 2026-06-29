@@ -31,10 +31,8 @@ public class TenantService {
         }
 
         Tenant tenant = new Tenant();
-
         tenant.setTenantCode(req.getTenantCode());
         tenant.setName(req.getName());
-
         tenant.setStatus(
                 req.getStatus() != null
                         ? TenantStatus.valueOf(req.getStatus())
@@ -66,12 +64,12 @@ public class TenantService {
     }
 
     @Transactional(readOnly = true)
-    public TenantDto get(UUID id) {
-        return tenantRepository.findById(id)
+    public TenantDto get(UUID tenantId) {
+        return tenantRepository.findById(tenantId)
                 .map(TenantConverter::toTransportModel)
                 .orElseThrow(() ->
                         new LnFEntityNotFoundException(
-                                "Tenant not found: " + id
+                                "Tenant not found: " + tenantId
                         ));
     }
 }

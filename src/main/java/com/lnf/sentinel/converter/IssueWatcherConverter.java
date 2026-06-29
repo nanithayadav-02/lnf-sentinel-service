@@ -17,6 +17,7 @@ public final class IssueWatcherConverter {
         dto.setId(entity.getId());
         dto.setIssueId(entity.getIssueId());
         dto.setUserId(entity.getUserId());
+        dto.setCreatedBy(entity.getCreatedBy());
         return dto;
     }
 
@@ -24,7 +25,7 @@ public final class IssueWatcherConverter {
         entity.setId(dto.getId());
         entity.setIssueId(dto.getIssueId());
         entity.setUserId(dto.getUserId());
-
+        entity.setCreatedBy(dto.getCreatedBy());
         return  entity;
     }
 }

@@ -23,13 +23,14 @@ public class IssueWatcherService {
     private final IssueRepository issueRepository;
 
     @Transactional
-    public void addWatcher(UUID issueId, UUID userId) {
+    public void addWatcher(UUID issueId, UUID userId,String createdBy) {
         searchForIssueId(issueId);
-        IssueWatcher w = repository.findByIssueIdAndUserId(issueId, userId)
+        IssueWatcher w = repository.findByIssueIdAndUserIdAndCreatedBy(issueId, userId,createdBy)
                 .orElseGet(() -> {
                     IssueWatcher watcher=new IssueWatcher();
                     watcher.setIssueId(issueId);
                     watcher.setUserId(userId);
+                    watcher.setCreatedBy(createdBy);
                     return repository.save(watcher);
                 });
         IssueWatcherConverter.toTransportModel(w);

@@ -16,17 +16,13 @@ public final class IssueLinkConverter {
         }
 
         IssueLinkDto dto = new IssueLinkDto();
-
-
         dto.setSourceIssueId(entity.getSourceIssueId());
         dto.setTargetIssueId(entity.getTargetIssueId());
-
         dto.setLinkType(
                 entity.getLinkType() != null
                         ? entity.getLinkType().name()
                         : null
         );
-
         return dto;
     }
 
@@ -35,11 +31,9 @@ public final class IssueLinkConverter {
         if (dto == null || entity == null) {
             return null;
         }
-
         entity.setId(dto.getId());
         entity.setSourceIssueId(dto.getSourceIssueId());
         entity.setTargetIssueId(dto.getTargetIssueId());
-
         if (dto.getLinkType() != null) {
             entity.setLinkType(LinkType.valueOf(dto.getLinkType()));
         }

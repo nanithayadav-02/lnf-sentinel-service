@@ -26,7 +26,7 @@ public class Issue extends AuditableEntity {
     private String description;
 
     @Column(name = "tenant_id")
-    private String tenantCode;
+    private UUID tenantId;
 
     @Column(name = "tenant_name")
     private String tenantName;

@@ -50,7 +50,6 @@ public class MetricsService {
     }
 
     private Specification<Issue> scope() {
-        // adjust to your tenant scoping; return a non-null spec.
         String tenant = TenantContext.getCurrentTenant();
         return (root, query, cb) ->
                 tenant == null ? cb.conjunction() : cb.equal(root.get("tenantName"), tenant);

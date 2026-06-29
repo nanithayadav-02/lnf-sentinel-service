@@ -18,7 +18,6 @@ public class TenantConverter {
     private TenantConverter() {
     }
 
-
     public static TenantDto toTransportModel(Tenant entity) {
 
         if (entity== null) {
