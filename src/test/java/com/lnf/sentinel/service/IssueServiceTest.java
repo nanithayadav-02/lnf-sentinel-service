@@ -5,12 +5,10 @@ import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.converter.IssueConverter;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.IssueStatusHistory;
-import com.lnf.sentinel.model.Tenant;
 import com.lnf.sentinel.model.enums.IssueStatus;
 import com.lnf.sentinel.model.enums.Severity;
 import com.lnf.sentinel.repository.IssueRepository;
 import com.lnf.sentinel.repository.IssueStatusHistoryRepository;
-import com.lnf.sentinel.repository.TenantRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,17 +16,13 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.test.web.servlet.MockMvc;
-
 import java.sql.Date;
 import java.util.*;
-
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,10 +31,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class IssueServiceTest {
 
-
-    @Autowired
-    private MockMvc mockMvc;
-
     @InjectMocks
     private IssueService service;
 
@@ -48,19 +38,12 @@ public class IssueServiceTest {
     private IssueRepository issueRepository;
 
     @Mock
-    private TenantRepository tenantRepository;
-
-    @Mock
     private IssueStatusHistoryRepository historyRepository;
 
-    @Mock
-    private TenantService tenantService;
-
-
     @Test
-    void createIssue() {
+    void testCreateIssue() {
         IssueDto dto = new IssueDto();
-        dto.setTenantCode("TEN-1001");
+        dto.setTenantId(UUID.randomUUID());
         dto.setTenantName("Tenant 1");
         dto.setSummary("Issue Summary");
         dto.setDescription("Issue Description");
@@ -86,7 +69,7 @@ public class IssueServiceTest {
     }
 
     @Test
-    void findById() throws Exception {
+    void testFindById() throws Exception {
         UUID uuid = UUID.randomUUID();
         Issue issue = new Issue();
         issue.setId(uuid);
@@ -100,7 +83,7 @@ public class IssueServiceTest {
     }
 
     @Test
-    void changeStatus() {
+    void testChangeStatus() {
         UUID uuid = UUID.randomUUID();
         Issue issue = new Issue();
         issue.setId(uuid);
@@ -123,7 +106,7 @@ public class IssueServiceTest {
     }
 
     @Test
-    void deleteByid() {
+    void testDeleteByid() {
         UUID uuid = UUID.randomUUID();
 
         Issue issue = new Issue();
@@ -138,7 +121,7 @@ public class IssueServiceTest {
     }
 
     @Test
-    void update() {
+    void testUpdate() {
 
         UUID uuid = UUID.randomUUID();
 
@@ -148,7 +131,7 @@ public class IssueServiceTest {
 
         IssueDto dto = new IssueDto();
         dto.setStatus(String.valueOf(IssueStatus.AWAITING_TENANT));
-        dto.setTenantCode("TNF");
+        dto.setTenantId(UUID.randomUUID());
 
         Issue entity = new Issue();
         entity.setId(uuid);
@@ -163,7 +146,7 @@ public class IssueServiceTest {
     }
 
     @Test
-    void listOfIssues() {
+    void testListOfIssues() {
         Pageable pageable = PageRequest.of(0, 10);
         Issue issue = new Issue();
         issue.setId(UUID.randomUUID());
@@ -180,7 +163,7 @@ public class IssueServiceTest {
         try (MockedStatic<IssueConverter> mocked = Mockito.mockStatic(IssueConverter.class)) {
             mocked.when(() -> IssueConverter.toTransportModel(issue))
                     .thenReturn(dto);
-            Page<IssueDto> result = service.list("tenant1", "TNF", IssueStatus.NEW,
+            Page<IssueDto> result = service.list("tenant1", UUID.randomUUID(), IssueStatus.NEW,
                     Severity.S2_HIGH, UUID.randomUUID(), "search", pageable);
             assertNotNull(result);
             assertEquals(2, result.getTotalElements());

@@ -1,8 +1,8 @@
+package com.lnf.sentinel.controller;
 
 import static org.aspectj.bridge.MessageUtil.fail;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lnf.dto.sentinel.IssueDto;
@@ -11,7 +11,6 @@ import com.lnf.sentinel.model.enums.IssueStatus;
 import com.lnf.sentinel.model.enums.Severity;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,7 +22,6 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@Nested
 class IssueControllerTest extends BaseTestClass {
 
     @Autowired
@@ -60,20 +57,20 @@ class IssueControllerTest extends BaseTestClass {
 
 
     @Test
-    void findById() throws Exception {
+    void testFindById() throws Exception {
 
         UUID issueId = UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43");
         IssueDto issueDto = mockIssueType();
 
         given(issueService.findById(any(UUID.class))).willReturn(issueDto);
 
-mockMvc.perform(get("/sentinel/issues/{id}",issueId)).andExpect(status().isOk());
+        mockMvc.perform(get("/sentinel/issues/{id}",issueId)).andExpect(status().isOk());
         verify(issueService).findById(any(UUID.class));
     }
 
-   @Test
-    void create() {
-     IssueDto issueDto=mockIssueType();
+    @Test
+    void testCreate() {
+        IssueDto issueDto=mockIssueType();
 
         String url = "/sentinel/issues";
 
@@ -91,37 +88,37 @@ mockMvc.perform(get("/sentinel/issues/{id}",issueId)).andExpect(status().isOk())
         verify(issueService).create(any(IssueDto.class));
     }
     @Test
-    void updateIssue() throws Exception {
+    void testUpdateIssue() throws Exception {
 
         UUID issueId = UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43");
         IssueDto requestDto = mockIssueType();
         IssueDto responseDto = mockIssueType();
 
-      doNothing().when(issueService).update(issueId,requestDto);
+        doNothing().when(issueService).update(issueId,requestDto);
         mockMvc.perform(put("/sentinel/issues/{id}", issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDto)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         verify(issueService).update(any(UUID.class), any(IssueDto.class));
     }
 
     @Test
-    void updateStatusForIssue() throws Exception {
+    void testUpdateStatusForIssue() throws Exception {
 
         UUID issueId = UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43");
         IssueDto requestDto = mockIssueType();
-       Map<String,Object> map=new HashMap<>();
-      map.put("status","CLOSED");
+        Map<String,Object> map=new HashMap<>();
+        map.put("status","CLOSED");
         doNothing().when(issueService).changeStatus(issueId,map);
         mockMvc.perform(patch("/sentinel/issues/{id}/status", issueId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(map))).andExpect(status().isNoContent());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(map))).andExpect(status().isNoContent());
 
         verify(issueService).changeStatus(issueId,map);
     }
     @Test
-    void deleteWithId() throws Exception {
+    void testDeleteWithId() throws Exception {
         UUID issueId = UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43");
         IssueDto issueDto = mockIssueType();
         doNothing().when(issueService).deleteById(issueId);
@@ -131,17 +128,18 @@ mockMvc.perform(get("/sentinel/issues/{id}",issueId)).andExpect(status().isOk())
     }
 
     @Test
-    void list_shouldReturnPagedIssues() throws Exception {
+    void testListOfIssues() throws Exception {
 
+        UUID tenantId=UUID.randomUUID();
         UUID assigneeId = UUID.randomUUID();
         IssueDto dto = new IssueDto();
         dto.setId(UUID.randomUUID());
         Page<IssueDto> page = new PageImpl<>(List.of(dto));
-        when(issueService.list(eq("tenant1"), eq("TNF"), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
+        when(issueService.list(eq("tenant1"), eq(tenantId), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
                 eq(assigneeId), eq("test"), any(Pageable.class))).thenReturn(page);
         mockMvc.perform(get("/sentinel/issues")
                         .param("tenantName", "tenant1")
-                        .param("tenantCode", "TNF")
+                        .param("tenantId", tenantId.toString())
                         .param("status", "NEW")
                         .param("severity", "S2_HIGH")
                         .param("assigneeId", assigneeId.toString())
@@ -152,21 +150,21 @@ mockMvc.perform(get("/sentinel/issues/{id}",issueId)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
-        verify(issueService).list(eq("tenant1"), eq("TNF"), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
+        verify(issueService).list(eq("tenant1"), eq(tenantId), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
                 eq(assigneeId), eq("test"), any(Pageable.class));
     }
-}
+
 
     private IssueDto mockIssueType() {
         UUID uuid= UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43");
-        return createIssueType(uuid, "geting the errors in issue Links", "TEN-1001");
+        return createIssueType(uuid, "geting the errors in issue Links", UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43"));
     }
 
-    private IssueDto createIssueType(UUID id, String summary, String tenantCode) {
+    private IssueDto createIssueType(UUID id, String summary, UUID tenantId) {
         IssueDto issueDto=new IssueDto();
         issueDto.setId(id);
         issueDto.setSummary(summary);
-       issueDto.setTenantCode(tenantCode);
+        issueDto.setTenantId(tenantId);
         return issueDto;
     }
 
@@ -179,4 +177,6 @@ mockMvc.perform(get("/sentinel/issues/{id}",issueId)).andExpect(status().isOk())
             throw new RuntimeException(e);
         }
     }
+}
+
 
