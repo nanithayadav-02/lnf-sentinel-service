@@ -72,7 +72,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health/**", "/actuator/info", "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/lnf-attendance/**").permitAll()
+                                "/lnf-sentinel/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
