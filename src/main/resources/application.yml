@@ -39,10 +39,9 @@ audit:
 lnf:
   tenant:
     enabled: ${TENANT_ENABLED:false}
+    default: ${TENANT_DEFAULT:LNF}
     databaseName: ${TENANT_DATABASE_NAME:sentinel}
-    auth:
-      base-url: ${LNF_TENANT_AUTH_BASE_URL:https://auth.leverandfulcrum.com}
-      internal-url: ${LNF_TENANT_AUTH_INTERNAL_URL:#{null}}
+
   entity-package: "com.lnf.sentinel.model"
 
 eureka:
@@ -127,9 +126,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}
-          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/${KEYCLOAK_REALM_NAME:lnf}/protocol/openid-connect/certs
-
+          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/lnf
+          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/realms/lnf/protocol/openid-connect/certs
       client:
         registration:
           sentinel-service:
