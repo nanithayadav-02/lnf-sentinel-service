@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sentinel/issues")
+@RequestMapping("/lnf/sentinel/issues")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Issues", description = "Production issues — the engineering record of truth")

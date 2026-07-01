@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sentinel/tenant")
+@RequestMapping("/lnf/sentinel/tenant")
 @RequiredArgsConstructor
 @Tag(name = "Tenants", description = "Tenant administration")
 public class TenantController {
@@ -36,5 +36,6 @@ public class TenantController {
     public TenantDto get(@PathVariable UUID tenantId) {
         return tenantService.get(tenantId);
     }
+
 
 }

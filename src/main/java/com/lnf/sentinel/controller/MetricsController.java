@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/metrics")
+@RequestMapping("/lnf/sentinel/metrics")
 @RequiredArgsConstructor
 @Tag(name = "Metrics", description = "Dashboard headline n" + "umbers")
 public class MetricsController {
