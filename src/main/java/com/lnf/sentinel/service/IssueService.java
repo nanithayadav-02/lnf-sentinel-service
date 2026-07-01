@@ -21,7 +21,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -63,7 +62,7 @@ public class IssueService {
         issue.setPriority(Priority.valueOf(resource.getPriority()));
         issue.setCategory(Category.valueOf(resource.getCategory()));
         issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
-        issue.setStatus(IssueStatus.NEW);
+        issue.setStatus(IssueStatus.valueOf(resource.getStatus()));
         issue.setDetectedAt(resource.getDetectedAt());
         issue.setSlaDueAt(resource.getSlaDueAt());
         Issue saved = issueRepository.saveAndFlush(issue);
@@ -155,8 +154,6 @@ public class IssueService {
         h.setNotes(notes);
         historyRepository.save(h);
     }
-
-
 
     private Issue searchForIssueId(UUID id) {
         return issueRepository.findById(id)
