@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("lnf/sentinel/issues")
+@RequestMapping("/lnf/sentinel/issues")
 @RequiredArgsConstructor
 public class issueLinkController {
 
