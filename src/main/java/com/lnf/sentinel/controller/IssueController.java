@@ -14,11 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sentinel/issues")
+@RequestMapping("/lnf/sentinel/issues")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Issues", description = "Production issues — the engineering record of truth")
@@ -70,4 +71,8 @@ public class IssueController {
         issueService.deleteById(id);
     }
 
+    @GetMapping("issuesBySeverity")
+    public Map<String,Object> getTotalIssuesBySeverity(){
+        return issueService.getIssueCountBySeverity();
+    }
 }

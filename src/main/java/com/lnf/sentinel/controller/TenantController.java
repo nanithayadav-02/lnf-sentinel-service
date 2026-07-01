@@ -11,10 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sentinel/tenant")
+@RequestMapping("/lnf/sentinel/tenant")
 @RequiredArgsConstructor
 @Tag(name = "Tenants", description = "Tenant administration")
 public class TenantController {
@@ -35,6 +36,12 @@ public class TenantController {
     @GetMapping("/{tenantId}")
     public TenantDto get(@PathVariable UUID tenantId) {
         return tenantService.get(tenantId);
+    }
+
+
+    @GetMapping("/issuesForEachTenant")
+    public Map<String,Object> getIssuesForEachTenant(){
+        return tenantService.getIssuesforEachTenant();
     }
 
 }
