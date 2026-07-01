@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/sentinel/issues")
+@RequestMapping("lnf/sentinel/issues")
 @RequiredArgsConstructor
 public class IssueWatcherController {
 
