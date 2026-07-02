@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.lnf.sentinel.service.IssueSpecifications.*;
 
@@ -62,7 +61,7 @@ public class IssueService {
         issue.setPriority(Priority.valueOf(resource.getPriority()));
         issue.setCategory(Category.valueOf(resource.getCategory()));
         issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
-        issue.setStatus(IssueStatus.NEW);
+        issue.setStatus(IssueStatus.valueOf(resource.getStatus()));
         issue.setDetectedAt(resource.getDetectedAt());
         issue.setSlaDueAt(resource.getSlaDueAt());
         Issue saved = issueRepository.saveAndFlush(issue);
@@ -168,9 +167,9 @@ public class IssueService {
         };
     }
 
-    public Map<String,Object> getIssueCountBySeverity() {
+    public Map<String, Object> getIssueCountBySeverity() {
 
-       List<Object[]> results=issueRepository.getIssueCountByseverity();
+        List<Object[]> results = issueRepository.getIssueCountByseverity();
         List<Map<String, Object>> severity = new ArrayList<>();
         List<Map<String, Object>> status = new ArrayList<>();
 

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 ;
 
@@ -30,14 +31,20 @@ public class MetricsService {
     private final IssueRepository issueRepository;
 
     @Transactional(readOnly = true)
-    public MetricSummaryDto summary() {
+    public MetricSummaryDto summary(UUID tenantId) {
 
-        long openTotal = issueRepository.count(scope().and(open()));
-        long s1Count = issueRepository.count(scope().and(open()).and(severity(Severity.S1_CRITICAL)));
-        long s2Count = issueRepository.count(scope().and(open()).and(severity(Severity.S2_HIGH)));
-        long inProgress = issueRepository.count(scope().and(status(IssueStatus.IN_PROGRESS)));
-        long awaitingTenant = issueRepository.count(scope().and(status(IssueStatus.AWAITING_TENANT)));
-        long slaBreached = issueRepository.count(scope().and(open()).and(breachingSla()));
+        boolean isTenant = tenantId != null;
+
+        Specification<Issue> spec = isTenant
+                ? scope(tenantId)
+                : scope();
+
+        long openTotal = issueRepository.count(spec.and(open()));
+        long s1Count = issueRepository.count(spec.and(open()).and(severity(Severity.S1_CRITICAL)));
+        long s2Count = issueRepository.count(spec.and(open()).and(severity(Severity.S2_HIGH)));
+        long inProgress = issueRepository.count(spec.and(status(IssueStatus.IN_PROGRESS)));
+        long awaitingTenant = issueRepository.count(spec.and(status(IssueStatus.AWAITING_TENANT)));
+        long slaBreached = issueRepository.count(spec.and(open()).and(breachingSla()));
 
         return MetricSummaryDto.builder()
                 .openTotal(openTotal)
@@ -53,6 +60,11 @@ public class MetricsService {
         String tenant = TenantContext.getCurrentTenant();
         return (root, query, cb) ->
                 tenant == null ? cb.conjunction() : cb.equal(root.get("tenantName"), tenant);
+    }
+
+    private Specification<Issue> scope(UUID tenantId) {
+        return (root, query, cb) ->
+                cb.equal(root.get("tenantId"), tenantId);
     }
 
     private Specification<Issue> open() {
