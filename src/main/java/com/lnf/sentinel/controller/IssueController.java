@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -68,6 +69,11 @@ public class IssueController {
     @Operation(summary = "Delete Issue By Id")
     public void delete(@PathVariable UUID id) {
         issueService.deleteById(id);
+    }
+
+    @GetMapping("issuesBySeverity")
+    public Map<String,Object> getTotalIssuesBySeverity(){
+        return issueService.getIssueCountBySeverity();
     }
 
 }
