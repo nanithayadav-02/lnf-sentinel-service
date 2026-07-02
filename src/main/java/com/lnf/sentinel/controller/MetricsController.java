@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/lnf/sentinel/metrics")
+@RequestMapping("/lnf/sentinel/issues/metrics")
 @RequiredArgsConstructor
 @Tag(name = "Metrics", description = "Dashboard headline n" + "umbers")
 public class MetricsController {
