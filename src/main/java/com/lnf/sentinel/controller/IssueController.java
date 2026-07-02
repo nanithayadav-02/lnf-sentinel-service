@@ -75,4 +75,5 @@ public class IssueController {
     public Map<String,Object> getTotalIssuesBySeverity(){
         return issueService.getIssueCountBySeverity();
     }
+
 }
