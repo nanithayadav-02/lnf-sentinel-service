@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.UUID;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -33,7 +35,7 @@ class MetricsControllerTest {
         MetricSummaryDto dto = new MetricSummaryDto();
 
 
-        when(metricsService.summary()).thenReturn(dto);
+        when(metricsService.summary(UUID.randomUUID())).thenReturn(dto);
 
         mockMvc.perform(get("/api/v1/metrics/summary"))
                 .andExpect(status().isOk());
