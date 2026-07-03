@@ -21,9 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.lnf.sentinel.service.IssueSpecifications.*;
 
@@ -63,7 +61,7 @@ public class IssueService {
         issue.setPriority(Priority.valueOf(resource.getPriority()));
         issue.setCategory(Category.valueOf(resource.getCategory()));
         issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
-        issue.setStatus(IssueStatus.NEW);
+        issue.setStatus(IssueStatus.valueOf(resource.getStatus()));
         issue.setDetectedAt(resource.getDetectedAt());
         issue.setSlaDueAt(resource.getSlaDueAt());
         Issue saved = issueRepository.saveAndFlush(issue);
@@ -157,7 +155,6 @@ public class IssueService {
     }
 
 
-
     private Issue searchForIssueId(UUID id) {
         return issueRepository.findById(id)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + id));
@@ -170,4 +167,29 @@ public class IssueService {
         };
     }
 
+    public Map<String, Object> getIssueCountBySeverity() {
+
+        List<Object[]> results = issueRepository.getIssueCountByseverity();
+        List<Map<String, Object>> severity = new ArrayList<>();
+        List<Map<String, Object>> status = new ArrayList<>();
+
+        for (Object[] row : results) {
+            String key = (String) row[0];
+            Long count = ((Number) row[1]).longValue();
+            Map<String, Object> map = new HashMap<>();
+            map.put("severity", key);
+            map.put("count", count);
+            if (key.startsWith("S1") || key.startsWith("S2")
+                    || key.startsWith("S3") || key.startsWith("S4")) {
+                severity.add(map);
+            } else {
+                status.add(map);
+            }
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("severity", severity);
+        result.put("status", status);
+        return result;
+    }
 }
+
