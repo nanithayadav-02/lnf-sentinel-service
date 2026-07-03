@@ -24,14 +24,10 @@ public final class IssueAuditHistoryConverter {
         if (entity.getIssue() != null) {
             dto.setIssueId(entity.getIssue().getId());
         }
-
         return dto;
     }
 
-    public static IssueAuditHistory toEntity(
-            IssueAuditHistoryDto dto,
-            IssueAuditHistory entity
-    ) {
+    public static IssueAuditHistory toEntity(IssueAuditHistoryDto dto, IssueAuditHistory entity) {
 
         if (dto == null || entity == null) {
             return null;
@@ -45,7 +41,7 @@ public final class IssueAuditHistoryConverter {
             issue.setId(dto.getIssueId());
             entity.setIssue(issue);
         }
-
         return entity;
     }
+
 }

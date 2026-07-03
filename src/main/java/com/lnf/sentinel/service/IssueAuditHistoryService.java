@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +24,6 @@ public class IssueAuditHistoryService {
     private final IssueAuditHistoryRepository issueAuditHistoryRepository;
     private final IssueRepository issueRepository;
 
-    @Transactional
     public void create(IssueAuditHistoryDto resource, UUID issueId) {
 
         Issue issue = issueRepository.findById(issueId)
@@ -61,8 +60,9 @@ public class IssueAuditHistoryService {
 
         return issueAuditHistoryRepository.findAll()
                 .stream()
+                .filter(Objects::nonNull)
                 .map(IssueAuditHistoryConverter::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }
