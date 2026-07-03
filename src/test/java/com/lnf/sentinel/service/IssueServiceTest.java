@@ -51,19 +51,19 @@ public class IssueServiceTest {
         dto.setAssignee("John");
         dto.setReportedBy("Siva");
         dto.setAffectedService("Service A");
-        dto.setSeverity("S1_CRITICAL");
+        dto.setSeverity(String.valueOf(Severity.S2_HIGH));
         dto.setPriority("P1");
         dto.setCategory("BUG");
         dto.setEnvironment("PRODUCTION");
         dto.setDetectedAt(Date.valueOf("2026-06-26"));
         dto.setSlaDueAt(Date.valueOf("2026-06-28"));
+        dto.setStatus(String.valueOf(IssueStatus.AWAITING_TENANT));
         when(issueRepository.nextIssueKeyNumber()).thenReturn(100L);
         Issue savedIssue = new Issue();
         savedIssue.setId(UUID.randomUUID());
 
         when(issueRepository.saveAndFlush(any(Issue.class))).thenReturn(savedIssue);
         service.create(dto);
-
         verify(issueRepository).nextIssueKeyNumber();
         verify(issueRepository).saveAndFlush(any(Issue.class));
     }

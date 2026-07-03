@@ -4,6 +4,7 @@ import com.lnf.sentinel.model.Issue;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 
 import java.util.List;
@@ -20,8 +21,14 @@ public interface IssueRepository extends JpaRepository<Issue, UUID>, JpaSpecific
     @Query(value = "SELECT nextval('public.issue_key_seq')", nativeQuery = true)
     long nextIssueKeyNumber();
 
-    @Query(value ="SELECT severity,COUNT(*) FROM issues GROUP BY severity" +
+    @Query(value ="SELECT s.severity,COUNT(i.severity) FROM(VALUES ('S1_CRITICAL'), ('S2_HIGH'), ('S3_MEDIUM')," +
+            "('S4_LOW')) AS s(severity) " +
+            "LEFT JOIN issues i ON i.severity = s.severity AND (:tenantId IS NULL OR i.tenant_id = :tenantId) " +
+            " GROUP BY s.severity" +
             " UNION ALL " +
-            "SELECT status,COUNT(*) FROM issues where status <> 'CLOSED' GROUP BY status",nativeQuery = true)
-    List<Object[]> getIssueCountByseverity();
+            "SELECT v.status, COUNT(i.status) " +
+            "FROM (VALUES ('IN_PROGRESS'), ('AWAITING_TENANT'), ('RESOLVED')) AS v(status) " +
+            "LEFT JOIN issues i ON i.status = v.status AND (:tenantId IS NULL OR i.tenant_id = :tenantId) " +
+            "GROUP BY v.status",nativeQuery = true)
+    List<Object[]> getIssueCountByseverity(@Param(value="tenantId") UUID tenantId);
 }

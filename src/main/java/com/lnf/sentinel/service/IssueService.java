@@ -167,9 +167,9 @@ public class IssueService {
         };
     }
 
-    public Map<String, Object> getIssueCountBySeverity() {
+    public Map<String, Object> getIssueCountBySeverity(UUID tenantId) {
 
-        List<Object[]> results = issueRepository.getIssueCountByseverity();
+        List<Object[]> results = issueRepository.getIssueCountByseverity(tenantId);
         List<Map<String, Object>> severity = new ArrayList<>();
         List<Map<String, Object>> status = new ArrayList<>();
 

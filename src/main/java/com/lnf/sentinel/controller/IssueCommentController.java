@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -17,7 +18,7 @@ public class IssueCommentController {
     private final IssueCommentService service;
 
     @GetMapping("/comments/{issueId}")
-    public List<IssueCommentDto> listComments(@PathVariable UUID issueId) {
+    public List<Map<String,Object>> listComments(@PathVariable UUID issueId) {
         return service.listComments(issueId);
     }
 

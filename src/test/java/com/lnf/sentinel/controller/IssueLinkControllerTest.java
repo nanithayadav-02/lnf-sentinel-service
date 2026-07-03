@@ -56,7 +56,7 @@ class IssueLinkControllerTest {
         Mockito.when(service.findByIssueId(issueId))
                 .thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/sentinel/issues/links/{id}", issueId))
+        mockMvc.perform(get("/lnf/sentinel/issues/links/{id}", issueId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].sourceIssueId")
                         .value(issueId.toString()));
@@ -70,7 +70,7 @@ class IssueLinkControllerTest {
         dto.setSourceIssueId(issueId);
         dto.setTargetIssueId(UUID.randomUUID());
 
-        mockMvc.perform(post("/sentinel/issues/links/{id}", issueId)
+        mockMvc.perform(post("/lnf/sentinel/issues/links/{id}", issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
@@ -83,7 +83,7 @@ class IssueLinkControllerTest {
     void shouldDeleteLink() throws Exception {
         UUID linkId = UUID.randomUUID();
 
-        mockMvc.perform(delete("/sentinel/issues/links/{linkId}", linkId))
+        mockMvc.perform(delete("/lnf/sentinel/issues/links/{linkId}", linkId))
                 .andExpect(status().isNoContent());
 
         Mockito.verify(service).deleteById(linkId);

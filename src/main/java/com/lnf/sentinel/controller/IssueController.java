@@ -72,8 +72,8 @@ public class IssueController {
     }
 
     @GetMapping("issuesBySeverity")
-    public Map<String,Object> getTotalIssuesBySeverity(){
-        return issueService.getIssueCountBySeverity();
+    public Map<String,Object> getTotalIssuesBySeverity(@RequestParam(required = false) UUID tenantId){
+        return issueService.getIssueCountBySeverity(tenantId);
     }
 
 }
