@@ -13,6 +13,8 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -40,7 +42,7 @@ class MetricsServiceTest {
 
             when(issueRepository.count(any(Specification.class))).thenReturn(10L);
 
-            MetricSummaryDto result = metricsService.summary();
+            MetricSummaryDto result = metricsService.summary(UUID.randomUUID());
 
             assertNotNull(result);
             assertEquals(10L, result.getOpenTotal());
@@ -63,7 +65,7 @@ class MetricsServiceTest {
 
             when(issueRepository.count(any(Specification.class))).thenReturn(5L);
 
-            MetricSummaryDto result = metricsService.summary();
+            MetricSummaryDto result = metricsService.summary(UUID.randomUUID());
 
             assertNotNull(result);
             assertEquals(5L, result.getOpenTotal());

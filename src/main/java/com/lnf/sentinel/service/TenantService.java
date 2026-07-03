@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,4 +72,25 @@ public class TenantService {
                                 "Tenant not found: " + tenantId
                         ));
     }
+
+    public Map<String, Object> getIssuesforEachTenant() {
+        List<Object[]> result=tenantRepository.findIssuesByTennat();
+        List<Map<String,Object>> data=new ArrayList<>();
+
+        for(Object[] row:result){
+            String code=(String)row[0];
+            String name=(String)row[1];
+            Long count=(Long) row[2];
+
+            Map<String,Object> map=new HashMap<>();
+            map.put("tenantCode",code);
+            map.put("tenantName",name);
+            map.put("count",count);
+            data.add(map);
+        }
+        Map<String,Object> map=new HashMap<>();
+        map.put("TenantData",data);
+        return map;
+    }
+
 }
