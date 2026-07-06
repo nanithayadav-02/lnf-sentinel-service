@@ -1,5 +1,6 @@
 package com.lnf.sentinel.service;
 
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.exception.LnFException;
@@ -12,10 +13,12 @@ import com.lnf.sentinel.repository.IssueRepository;
 import com.lnf.sentinel.repository.IssueStatusHistoryRepository;
 import com.lnf.sentinel.repository.TenantRepository;
 import com.lnf.sentinel.tenant.TenantFilterResolver;
+import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,18 @@ public class IssueService {
     private final TenantFilterResolver tenantFilterResolver;
     @Value("${lnf.tenant.enabled}")
     private boolean tenantEnabled;
+
+    private static Pageable createPageable(PageRequestDto pageRequestDto) {
+        return PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize(),
+                RestUtil.constructSort(pageRequestDto.getSortBy(), pageRequestDto.getSortOrder()));
+    }
+
+    public static Specification<Issue> tenantId(UUID tenantId) {
+        return (root, query, cb) -> {
+            if (tenantId == null) return null;
+            return cb.equal(root.get("tenantId"), tenantId);
+        };
+    }
 
     @Transactional
     public void create(IssueDto resource) {
@@ -95,7 +110,8 @@ public class IssueService {
 
     @Transactional(readOnly = true)
     public Page<IssueDto> list(String tenantName, UUID tenantId, IssueStatus status, Severity severity,
-                               UUID assigneeId, String search, Pageable pageable) {
+                               UUID assigneeId, String search, PageRequestDto dto) {
+        Pageable pageable = createPageable(dto);
         Specification<Issue> spec = Specification
                 .where(tenantName(tenantName))
                 .and(tenantId(tenantId))
@@ -154,17 +170,9 @@ public class IssueService {
         historyRepository.save(h);
     }
 
-
     private Issue searchForIssueId(UUID id) {
         return issueRepository.findById(id)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + id));
-    }
-
-    public static Specification<Issue> tenantId(UUID tenantId) {
-        return (root, query, cb) -> {
-            if (tenantId == null) return null;
-            return cb.equal(root.get("tenantId"), tenantId);
-        };
     }
 
     public Map<String, Object> getIssueCountBySeverity(UUID tenantId) {
@@ -190,6 +198,12 @@ public class IssueService {
         result.put("severity", severity);
         result.put("status", status);
         return result;
+    }
+
+    public List<IssueDto> searchForIssue(String search) {
+        Specification<Issue> spec = Specification.where(search(search));
+        List<Issue> issue = issueRepository.findAll(spec);
+        return issue.stream().map(IssueConverter::toTransportModel).toList();
     }
 }
 

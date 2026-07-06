@@ -1,15 +1,16 @@
 package com.lnf.sentinel.controller;
 
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.model.enums.IssueStatus;
 import com.lnf.sentinel.model.enums.Severity;
 import com.lnf.sentinel.service.IssueService;
+import com.lnf.service.common.page.PageableAsQueryParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,14 +30,18 @@ public class IssueController {
 
     @GetMapping
     @Operation(summary = "List issues (filterable, paginated)")
-    public Page<IssueDto> list(@RequestParam(required = false) String tenantName,
-                               @RequestParam(required = false) UUID tenantId,
-                               @RequestParam(required = false) IssueStatus status,
-                               @RequestParam(required = false) Severity severity,
-                               @RequestParam(required = false) UUID assigneeId,
-                               @RequestParam(required = false) String search,
-                               Pageable pageable) {
-        return issueService.list(tenantName, tenantId, status, severity, assigneeId, search, pageable);
+    public ResponseEntity<?> list(@RequestParam(required = false) String tenantName,
+                                  @RequestParam(required = false) UUID tenantId,
+                                  @RequestParam(required = false) IssueStatus status,
+                                  @RequestParam(required = false) Severity severity,
+                                  @RequestParam(required = false) UUID assigneeId,
+                                  @RequestParam(required = false) String search,
+                                  @PageableAsQueryParam PageRequestDto pageRequest) {
+        if (pageRequest != null && pageRequest.getPage() != null) {
+            Page<IssueDto> issues = issueService.list(tenantName, tenantId, status, severity, assigneeId, search, pageRequest);
+            return ResponseEntity.ok(issues);
+        }
+        return ResponseEntity.ok(issueService.searchForIssue(search));
     }
 
     @PostMapping
@@ -72,7 +77,7 @@ public class IssueController {
     }
 
     @GetMapping("issuesBySeverity")
-    public Map<String,Object> getTotalIssuesBySeverity(@RequestParam(required = false) UUID tenantId){
+    public Map<String, Object> getTotalIssuesBySeverity(@RequestParam(required = false) UUID tenantId) {
         return issueService.getIssueCountBySeverity(tenantId);
     }
 
