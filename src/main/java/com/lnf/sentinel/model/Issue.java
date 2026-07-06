@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -78,6 +79,9 @@ public class Issue extends AuditableEntity {
 
     @Column(name = "resolved_at")
     private Date resolvedAt;
+
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
+    private List<IssueAuditHistory> auditHistories;
 
     /**
      * True when past SLA and not yet in a terminal state.
