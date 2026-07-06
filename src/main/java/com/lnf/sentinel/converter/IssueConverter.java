@@ -23,6 +23,7 @@ public class IssueConverter {
                 .summary(entity.getSummary())
                 .description(entity.getDescription())
                 .tenantId(entity.getTenantId())
+                .rootCause(entity.getRootCause())
                 .tenantName(entity.getTenantName())
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
                 .severity(entity.getSeverity() != null ? entity.getSeverity().name() : null)
@@ -54,7 +55,7 @@ public class IssueConverter {
         issue.setIssueKey(transport.getIssueKey());
         issue.setSummary(transport.getSummary());
         issue.setDescription(transport.getDescription());
-
+        issue.setRootCause(transport.getRootCause());
         if (transport.getTenantId() != null) {
             issue.setTenantId(transport.getTenantId());
         }

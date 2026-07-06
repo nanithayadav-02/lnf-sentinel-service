@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,7 +19,7 @@ public class issueLinkController {
     private final IssueLinkService service;
 
     @GetMapping("/links/{issueId}")
-    public List<IssueLinkDto> listLinks(@PathVariable UUID issueId) {
+    public List<Map<String,Object>> listLinks(@PathVariable UUID issueId) {
         return service.findByIssueId(issueId);
     }
 

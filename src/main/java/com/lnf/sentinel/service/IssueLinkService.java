@@ -12,8 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -51,10 +55,20 @@ public class IssueLinkService {
     }
 
     @Transactional(readOnly = true)
-    public List<IssueLinkDto> findByIssueId(UUID issueId) {
+    public List<Map<String,Object>> findByIssueId(UUID issueId) {
         searchForIssueId(issueId);
-        List<IssueLink> entities = repository.findBySourceIssueId(issueId);
-        return entities.stream().map(IssueLinkConverter::toDto).toList();
+        List<Object[]> entities = repository.findByIssuesDetails(issueId);
+        return entities.
+                stream().map(row ->{
+                    Map<String,Object> map=new HashMap<>();
+                    map.put("target-id",row[0]);
+                    map.put("Id",row[1]);
+                    map.put("rootCause",row[2]);
+                    map.put("issueKey",row[3]);
+                    map.put("Summary",row[4]);
+                    map.put("linkType",row[5]);
+                    return map;
+                        }).toList();
     }
 
     @Transactional

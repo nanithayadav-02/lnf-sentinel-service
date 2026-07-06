@@ -31,6 +31,9 @@ public class Issue extends AuditableEntity {
     @Column(name = "tenant_name")
     private String tenantName;
 
+    @Column(name="root_cause")
+    private String rootCause;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private IssueStatus status = IssueStatus.NEW;
