@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.BaseTestClass;
 import com.lnf.sentinel.model.enums.IssueStatus;
@@ -130,13 +131,24 @@ class IssueControllerTest extends BaseTestClass {
     @Test
     void testListOfIssues() throws Exception {
 
-        UUID tenantId=UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
         UUID assigneeId = UUID.randomUUID();
+
         IssueDto dto = new IssueDto();
         dto.setId(UUID.randomUUID());
+
         Page<IssueDto> page = new PageImpl<>(List.of(dto));
-        when(issueService.list(eq("tenant1"), eq(tenantId), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
-                eq(assigneeId), eq("test"), any(Pageable.class))).thenReturn(page);
+
+        when(issueService.list(
+                eq("tenant1"),
+                eq(tenantId),
+                eq(IssueStatus.NEW),
+                eq(Severity.S2_HIGH),
+                eq(assigneeId),
+                eq("test"),
+                any(PageRequestDto.class)))
+                .thenReturn(page);
+
         mockMvc.perform(get("/lnf/sentinel/issues")
                         .param("tenantName", "tenant1")
                         .param("tenantId", tenantId.toString())
@@ -150,8 +162,15 @@ class IssueControllerTest extends BaseTestClass {
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
-        verify(issueService).list(eq("tenant1"), eq(tenantId), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
-                eq(assigneeId), eq("test"), any(Pageable.class));
+
+        verify(issueService).list(
+                eq("tenant1"),
+                eq(tenantId),
+                eq(IssueStatus.NEW),
+                eq(Severity.S2_HIGH),
+                eq(assigneeId),
+                eq("test"),
+                any(PageRequestDto.class));
     }
 
 
