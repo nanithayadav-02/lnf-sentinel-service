@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.BaseTestClass;
 import com.lnf.sentinel.model.enums.IssueStatus;
@@ -64,7 +65,7 @@ class IssueControllerTest extends BaseTestClass {
 
         given(issueService.findById(any(UUID.class))).willReturn(issueDto);
 
-        mockMvc.perform(get("/sentinel/issues/{id}",issueId)).andExpect(status().isOk());
+        mockMvc.perform(get("/lnf/sentinel/issues/{id}",issueId)).andExpect(status().isOk());
         verify(issueService).findById(any(UUID.class));
     }
 
@@ -72,7 +73,7 @@ class IssueControllerTest extends BaseTestClass {
     void testCreate() {
         IssueDto issueDto=mockIssueType();
 
-        String url = "/sentinel/issues";
+        String url = "/lnf/sentinel/issues";
 
         doNothing().when(issueService).create(any(IssueDto.class));
 
@@ -95,7 +96,7 @@ class IssueControllerTest extends BaseTestClass {
         IssueDto responseDto = mockIssueType();
 
         doNothing().when(issueService).update(issueId,requestDto);
-        mockMvc.perform(put("/sentinel/issues/{id}", issueId)
+        mockMvc.perform(put("/lnf/sentinel/issues/{id}", issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDto)))
                 .andExpect(status().isOk());
@@ -111,7 +112,7 @@ class IssueControllerTest extends BaseTestClass {
         Map<String,Object> map=new HashMap<>();
         map.put("status","CLOSED");
         doNothing().when(issueService).changeStatus(issueId,map);
-        mockMvc.perform(patch("/sentinel/issues/{id}/status", issueId)
+        mockMvc.perform(patch("/lnf/sentinel/issues/{id}/status", issueId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(map))).andExpect(status().isNoContent());
 
@@ -122,7 +123,7 @@ class IssueControllerTest extends BaseTestClass {
         UUID issueId = UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43");
         IssueDto issueDto = mockIssueType();
         doNothing().when(issueService).deleteById(issueId);
-        mockMvc.perform(delete("/sentinel/issues/{id}",issueId)).andExpect(status().isOk());
+        mockMvc.perform(delete("/lnf/sentinel/issues/{id}",issueId)).andExpect(status().isOk());
         verify(issueService).deleteById(issueId);
 
     }
@@ -130,14 +131,25 @@ class IssueControllerTest extends BaseTestClass {
     @Test
     void testListOfIssues() throws Exception {
 
-        UUID tenantId=UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
         UUID assigneeId = UUID.randomUUID();
+
         IssueDto dto = new IssueDto();
         dto.setId(UUID.randomUUID());
+
         Page<IssueDto> page = new PageImpl<>(List.of(dto));
-        when(issueService.list(eq("tenant1"), eq(tenantId), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
-                eq(assigneeId), eq("test"), any(Pageable.class))).thenReturn(page);
-        mockMvc.perform(get("/sentinel/issues")
+
+        when(issueService.list(
+                eq("tenant1"),
+                eq(tenantId),
+                eq(IssueStatus.NEW),
+                eq(Severity.S2_HIGH),
+                eq(assigneeId),
+                eq("test"),
+                any(PageRequestDto.class)))
+                .thenReturn(page);
+
+        mockMvc.perform(get("/lnf/sentinel/issues")
                         .param("tenantName", "tenant1")
                         .param("tenantId", tenantId.toString())
                         .param("status", "NEW")
@@ -150,8 +162,15 @@ class IssueControllerTest extends BaseTestClass {
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
-        verify(issueService).list(eq("tenant1"), eq(tenantId), eq(IssueStatus.NEW), eq(Severity.S2_HIGH),
-                eq(assigneeId), eq("test"), any(Pageable.class));
+
+        verify(issueService).list(
+                eq("tenant1"),
+                eq(tenantId),
+                eq(IssueStatus.NEW),
+                eq(Severity.S2_HIGH),
+                eq(assigneeId),
+                eq("test"),
+                any(PageRequestDto.class));
     }
 
 

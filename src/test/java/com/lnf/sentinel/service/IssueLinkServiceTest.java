@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -119,29 +119,34 @@ class IssueLinkServiceTest {
 
     @Nested
     class FindByIssueIdTests {
-
         @Test
         void shouldReturnLinksWhenIssueExists() {
 
             UUID issueId = UUID.randomUUID();
-            IssueLink mockLink = new IssueLink();
-            mockLink.setSourceIssueId(issueId);
-            mockLink.setTargetIssueId(UUID.randomUUID());
-            mockLink.setLinkType(LinkType.RELATES_TO);
 
-            when(issueRepository.findById(issueId)).thenReturn(Optional.of(new Issue()));
-            when(repository.findBySourceIssueId(issueId)).thenReturn(List.of(mockLink));
+            Object[] row = new Object[]{
+                    UUID.randomUUID(),
+                    UUID.randomUUID(),
+                    "Database issue",
+                    "ISSUE-101",
+                    "Service unavailable",
+                    LinkType.RELATES_TO
+            };
 
+            when(issueRepository.findById(issueId))
+                    .thenReturn(Optional.of(new Issue()));
+            when(repository.findByIssuesDetails(issueId))
+                    .thenReturn(List.<Object[]>of(row));
 
-            List<IssueLinkDto> result = service.findByIssueId(issueId);
-
+            List<Map<String, Object>> result = service.findByIssueId(issueId);
 
             assertNotNull(result);
             assertEquals(1, result.size());
-            verify(repository, times(1)).findBySourceIssueId(issueId);
+
+            verify(issueRepository, times(1)).findById(issueId);
+            verify(repository, times(1)).findByIssuesDetails(issueId);
         }
     }
-
     @Nested
     class DeleteByIdTests {
 

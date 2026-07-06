@@ -53,7 +53,7 @@ class IssueWatcherControllerTest {
                 .thenReturn(List.of(dto));
 
         mockMvc.perform(
-                        get("/sentinel/issues/watchers")
+                        get("/lnf/sentinel/issues/watchers")
                                 .param("issueId", issueId.toString())
                 )
                 .andExpect(status().isOk());
@@ -72,7 +72,7 @@ class IssueWatcherControllerTest {
                 .addWatcher(issueId, userId,createdBY);
 
         mockMvc.perform(
-                        post("/sentinel/issues/watchers")
+                        post("/lnf/sentinel/issues/watchers")
                                 .param("issueId", issueId.toString())
                                 .param("userId", userId.toString())
                                 .param("createdBy",createdBY)
@@ -92,7 +92,7 @@ class IssueWatcherControllerTest {
                 .removeWatcher(issueId, userId);
 
         mockMvc.perform(
-                        delete("/sentinel/issues/watchers")
+                        delete("/lnf/sentinel/issues/watchers")
                                 .param("issueId", issueId.toString())
                                 .param("userId", userId.toString())
                 )

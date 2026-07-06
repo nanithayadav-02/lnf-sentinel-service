@@ -1,6 +1,7 @@
 package com.lnf.sentinel.service;
 
 
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.converter.IssueConverter;
 import com.lnf.sentinel.model.Issue;
@@ -51,19 +52,19 @@ public class IssueServiceTest {
         dto.setAssignee("John");
         dto.setReportedBy("Siva");
         dto.setAffectedService("Service A");
-        dto.setSeverity("S1_CRITICAL");
+        dto.setSeverity(String.valueOf(Severity.S2_HIGH));
         dto.setPriority("P1");
         dto.setCategory("BUG");
         dto.setEnvironment("PRODUCTION");
         dto.setDetectedAt(Date.valueOf("2026-06-26"));
         dto.setSlaDueAt(Date.valueOf("2026-06-28"));
+        dto.setStatus(String.valueOf(IssueStatus.AWAITING_TENANT));
         when(issueRepository.nextIssueKeyNumber()).thenReturn(100L);
         Issue savedIssue = new Issue();
         savedIssue.setId(UUID.randomUUID());
 
         when(issueRepository.saveAndFlush(any(Issue.class))).thenReturn(savedIssue);
         service.create(dto);
-
         verify(issueRepository).nextIssueKeyNumber();
         verify(issueRepository).saveAndFlush(any(Issue.class));
     }
@@ -147,29 +148,40 @@ public class IssueServiceTest {
 
     @Test
     void testListOfIssues() {
+        PageRequestDto pageRequestDto = new PageRequestDto();
+        pageRequestDto.setPage(0);
+        pageRequestDto.setSize(10);
+
         Pageable pageable = PageRequest.of(0, 10);
-        Issue issue = new Issue();
-        issue.setId(UUID.randomUUID());
-        issue.setStatus(IssueStatus.NEW);
-        Issue issues = new Issue();
-        issues.setId(UUID.randomUUID());
-        issues.setStatus(IssueStatus.AWAITING_TENANT);
-        List<Issue> issueList = List.of(issue,issues);
-        Page<Issue> issuePage = new PageImpl<>(issueList, pageable, 2);
-        IssueDto dto = new IssueDto();
-        dto.setId(issue.getId());
+
+        Issue issue1 = new Issue();
+        issue1.setId(UUID.randomUUID());
+        issue1.setStatus(IssueStatus.NEW);
+
+        Issue issue2 = new Issue();
+        issue2.setId(UUID.randomUUID());
+        issue2.setStatus(IssueStatus.AWAITING_TENANT);
+
+        List<Issue> issues = List.of(issue1, issue2);
+        Page<Issue> issuePage = new PageImpl<>(issues, pageable, 2);
+
         when(issueRepository.findAll(any(Specification.class), eq(pageable)))
                 .thenReturn(issuePage);
-        try (MockedStatic<IssueConverter> mocked = Mockito.mockStatic(IssueConverter.class)) {
-            mocked.when(() -> IssueConverter.toTransportModel(issue))
-                    .thenReturn(dto);
-            Page<IssueDto> result = service.list("tenant1", UUID.randomUUID(), IssueStatus.NEW,
-                    Severity.S2_HIGH, UUID.randomUUID(), "search", pageable);
-            assertNotNull(result);
-            assertEquals(2, result.getTotalElements());
 
-            verify(issueRepository).findAll(any(Specification.class), eq(pageable));
-        }
+        Page<IssueDto> result = service.list(
+                "tenant1",
+                UUID.randomUUID(),
+                IssueStatus.NEW,
+                Severity.S2_HIGH,
+                UUID.randomUUID(),
+                "search",
+                pageRequestDto);
+
+        assertNotNull(result);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
+
+        verify(issueRepository).findAll(any(Specification.class), eq(pageable));
     }
 }
 

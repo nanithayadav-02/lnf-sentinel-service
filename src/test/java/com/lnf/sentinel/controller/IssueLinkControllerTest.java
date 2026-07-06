@@ -17,7 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -46,20 +48,20 @@ class IssueLinkControllerTest {
     @MockBean
     private IssueLinkService service;
 
-    @Test
+   @Test
     void shouldListLinks() throws Exception {
-        UUID issueId = UUID.randomUUID();
+       UUID issueId = UUID.randomUUID();
 
-        IssueLinkDto dto = new IssueLinkDto();
-        dto.setSourceIssueId(issueId);
+       Map<String, Object> link = new HashMap<>();
+       link.put("sourceIssueId", issueId.toString());
 
-        Mockito.when(service.findByIssueId(issueId))
-                .thenReturn(List.of(dto));
+       Mockito.when(service.findByIssueId(issueId))
+               .thenReturn(List.of(link));
 
-        mockMvc.perform(get("/sentinel/issues/links/{id}", issueId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].sourceIssueId")
-                        .value(issueId.toString()));
+       mockMvc.perform(get("/lnf/sentinel/issues/links/{issueId}", issueId))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$[0].sourceIssueId")
+                       .value(issueId.toString()));
     }
 
     @Test
@@ -70,7 +72,7 @@ class IssueLinkControllerTest {
         dto.setSourceIssueId(issueId);
         dto.setTargetIssueId(UUID.randomUUID());
 
-        mockMvc.perform(post("/sentinel/issues/links/{id}", issueId)
+        mockMvc.perform(post("/lnf/sentinel/issues/links/{id}", issueId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
@@ -83,7 +85,7 @@ class IssueLinkControllerTest {
     void shouldDeleteLink() throws Exception {
         UUID linkId = UUID.randomUUID();
 
-        mockMvc.perform(delete("/sentinel/issues/links/{linkId}", linkId))
+        mockMvc.perform(delete("/lnf/sentinel/issues/links/{linkId}", linkId))
                 .andExpect(status().isNoContent());
 
         Mockito.verify(service).deleteById(linkId);

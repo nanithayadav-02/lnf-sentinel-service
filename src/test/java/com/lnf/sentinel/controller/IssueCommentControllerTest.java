@@ -12,7 +12,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -39,7 +43,7 @@ public class IssueCommentControllerTest extends BaseTestClass {
         issueCommentDto.setId(issueId);
 
         doNothing().when(issueCommentService).addComment(eq(issueId),any(IssueCommentDto.class));
-        mockMvc.perform(post("/sentinel/issues/comments/{issueId}",issueId)
+        mockMvc.perform(post("/lnf/sentinel/issues/comments/{issueId}",issueId)
                 .contentType(APPLICATION_JSON)
                 .content(asJsonString(issueCommentDto))).andExpect(status().isOk());
 
@@ -48,16 +52,26 @@ public class IssueCommentControllerTest extends BaseTestClass {
 
     @Test
     void listOfIssueComments() throws Exception{
-        UUID uuid=UUID.randomUUID();
+        UUID issueId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
 
         IssueCommentDto issueCommentDto=new IssueCommentDto();
-        issueCommentDto.setId(uuid);
+        issueCommentDto.setId(issueId);
+
+
+        Map<String, Object> comment = new HashMap<>();
+        comment.put("IssueId", issueId);
+        comment.put("UserId", userId);
+        comment.put("FullName", "John Doe");
+        comment.put("createdTime", LocalDateTime.now());
+
+        List<Map<String, Object>> comments = List.of(comment);
 
         List<IssueCommentDto> list=List.of(issueCommentDto);
 
-        when(issueCommentService.listComments(uuid)).thenReturn(list);
+        when(issueCommentService.listComments(issueId)).thenReturn(comments);
 
-        mockMvc.perform(get("/sentinel/issues/comments/{issueId}",uuid)
+        mockMvc.perform(get("/lnf/sentinel/issues/comments/{issueId}",issueId)
                         .contentType(APPLICATION_JSON))
                         .andExpect(status().isOk());
     }

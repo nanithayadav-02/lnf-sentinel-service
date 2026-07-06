@@ -45,7 +45,7 @@ class TenantControllerTest {
 
         when(tenantService.list()).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/sentinel/tenant"))
+        mockMvc.perform(get("/lnf/sentinel/tenant"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].tenantCode").value("TENANT001"));
     }
@@ -58,7 +58,7 @@ class TenantControllerTest {
         when(tenantService.create(any(TenantDto.class)))
                 .thenReturn(dto);
 
-        mockMvc.perform(post("/sentinel/tenant")
+        mockMvc.perform(post("/lnf/sentinel/tenant")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());

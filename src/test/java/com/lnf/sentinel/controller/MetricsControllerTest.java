@@ -37,7 +37,7 @@ class MetricsControllerTest {
 
         when(metricsService.summary(UUID.randomUUID())).thenReturn(dto);
 
-        mockMvc.perform(get("/api/v1/metrics/summary"))
+        mockMvc.perform(get("/lnf/sentinel/issues/metrics/summary"))
                 .andExpect(status().isOk());
     }
 }

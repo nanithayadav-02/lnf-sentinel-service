@@ -11,9 +11,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.time.LocalDateTime;
+import java.util.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.*;
@@ -33,26 +34,34 @@ public class IssueCommentServiceTest {
     @Test
     void testListOfIssueComments(){
 
-        UUID uuid = UUID.randomUUID();
+        UUID issueId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+
         Issue issue = new Issue();
-        issue.setId(uuid);
+        issue.setId(issueId);
 
-        IssueComment issueComment = new IssueComment();
-        issueComment.setId(UUID.randomUUID());
-        issueComment.setIssueId(uuid);
+        Object[] row = new Object[]{
+                issueId,
+                userId,
+                "John Doe",
+                LocalDateTime.now()
+        };
 
-        when(issueRepository.findById(uuid))
+        List<Object[]> rows=new ArrayList<>();
+        rows.add(row);
+        when(issueRepository.findById(issueId))
                 .thenReturn(Optional.of(issue));
 
-        when(issueCommentRepository.findByIssueId(uuid))
-                .thenReturn(List.of(issueComment));
+        when(issueCommentRepository.findByIssueId(issueId))
+                .thenReturn(rows);
 
-        List<IssueCommentDto> result = issueCommentService.listComments(uuid);
+
+        List<Map<String, Object>> result = issueCommentService.listComments(issueId);
 
         assertEquals(1, result.size());
 
-        verify(issueRepository).findById(uuid);
-        verify(issueCommentRepository).findByIssueId(uuid);
+        verify(issueRepository).findById(issueId);
+        verify(issueCommentRepository).findByIssueId(issueId);
     }
 
     @Test
