@@ -31,12 +31,12 @@ public class MetricsService {
     private final IssueRepository issueRepository;
 
     @Transactional(readOnly = true)
-    public MetricSummaryDto summary(UUID tenantId) {
+    public MetricSummaryDto summary(String tenantName) {
 
-        boolean isTenant = tenantId != null;
+        boolean isTenant = tenantName != null;
 
         Specification<Issue> spec = isTenant
-                ? scope(tenantId)
+                ? scope(tenantName)
                 : scope();
 
         long openTotal = issueRepository.count(spec.and(open()));
@@ -62,9 +62,9 @@ public class MetricsService {
                 tenant == null ? cb.conjunction() : cb.equal(root.get("tenantName"), tenant);
     }
 
-    private Specification<Issue> scope(UUID tenantId) {
+    private Specification<Issue> scope(String  tenantName) {
         return (root, query, cb) ->
-                cb.equal(root.get("tenantId"), tenantId);
+                cb.equal(root.get("tenantName"), tenantName);
     }
 
     private Specification<Issue> open() {
@@ -88,4 +88,5 @@ public class MetricsService {
                 cb.lessThan(root.get("slaDueAt"), new Date())
         );
     }
+
 }

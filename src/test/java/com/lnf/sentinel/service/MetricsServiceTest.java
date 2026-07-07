@@ -42,7 +42,7 @@ class MetricsServiceTest {
 
             when(issueRepository.count(any(Specification.class))).thenReturn(10L);
 
-            MetricSummaryDto result = metricsService.summary(UUID.randomUUID());
+            MetricSummaryDto result = metricsService.summary("lnf");
 
             assertNotNull(result);
             assertEquals(10L, result.getOpenTotal());
@@ -65,7 +65,7 @@ class MetricsServiceTest {
 
             when(issueRepository.count(any(Specification.class))).thenReturn(5L);
 
-            MetricSummaryDto result = metricsService.summary(UUID.randomUUID());
+            MetricSummaryDto result = metricsService.summary("lnf");
 
             assertNotNull(result);
             assertEquals(5L, result.getOpenTotal());
