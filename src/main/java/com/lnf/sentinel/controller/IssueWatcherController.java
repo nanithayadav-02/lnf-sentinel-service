@@ -24,14 +24,14 @@ public class IssueWatcherController {
 
     @PostMapping("/watchers")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addWatcher(@RequestParam UUID issueId, @RequestParam UUID userId,@RequestParam String createdBy) {
-        service.addWatcher(issueId, userId,createdBy);
+    public void addWatcher(@RequestParam UUID issueId, @RequestParam String userEmail, @RequestParam String userName) {
+        service.addWatcher(issueId, userEmail, userName);
     }
 
     @DeleteMapping("/watchers")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeWatcher(@RequestParam UUID issueId, @RequestParam UUID userId) {
-        service.removeWatcher(issueId, userId);
+    public void removeWatcher(@RequestParam UUID issueId, @RequestParam String userEmail) {
+        service.removeWatcher(issueId, userEmail);
     }
 
 }

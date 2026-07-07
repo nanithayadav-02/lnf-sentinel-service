@@ -23,24 +23,20 @@ public class IssueWatcherService {
     private final IssueRepository issueRepository;
 
     @Transactional
-    public void addWatcher(UUID issueId, UUID userId,String createdBy) {
+    public void addWatcher(UUID issueId, String userEmail, String userName) {
         searchForIssueId(issueId);
-        IssueWatcher w = repository.findByIssueIdAndUserIdAndCreatedBy(issueId, userId,createdBy)
-                .orElseGet(() -> {
-                    IssueWatcher watcher=new IssueWatcher();
-                    watcher.setIssueId(issueId);
-                    watcher.setUserId(userId);
-                    watcher.setCreatedBy(createdBy);
-                    return repository.save(watcher);
-                });
-        IssueWatcherConverter.toTransportModel(w);
-
+        IssueWatcher watcher = new IssueWatcher();
+        watcher.setIssueId(issueId);
+        watcher.setUserEmail(userEmail);
+        watcher.setUserName(userName);
+        repository.save(watcher);
+        IssueWatcherConverter.toTransportModel(watcher);
     }
 
     @Transactional
-    public void removeWatcher(UUID issueId, UUID userId) {
+    public void removeWatcher(UUID issueId, String userEmail) {
         searchForIssueId(issueId);
-        repository.findByIssueIdAndUserId(issueId, userId)
+        repository.findByIssueIdAndUserEmail(issueId, userEmail)
                 .ifPresent(repository::delete);
     }
 

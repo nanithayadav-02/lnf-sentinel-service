@@ -20,18 +20,13 @@ public class IssueComment extends AuditableEntity {
     @Column(name = "issue_id", nullable = false)
     private UUID issueId;
 
-    @Column(name = "user_id")
-    private UUID userId;
+    @Column(name = "user_name")
+    private String userName;
 
-    @Column(name = "tenant_name")
-    private String tenantName;
+    @Column(name = "user_email")
+    private String userEmail;
 
     @Column(nullable = false, columnDefinition = "text")
     private String body;
 
-    @Column(nullable = false)
-    private boolean internal = true;
-
-    @Column(name="author_id")
-    private UUID authorId;
 }

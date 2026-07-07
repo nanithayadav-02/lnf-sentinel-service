@@ -77,10 +77,11 @@ management:
         enabled: true
 logging:
   level:
-    org:
-      springframework: INFO
+    org.springframework: INFO
+    org.springframework.data: WARN
     root: ERROR
-  com.lnf.sentinel.*: DEBUG
+    com.lnf.sentinel.*: DEBUG
+    com.lnf.listener.audit.ChangeTrackerListener: DEBUG
 
 springdoc:
   api-docs:

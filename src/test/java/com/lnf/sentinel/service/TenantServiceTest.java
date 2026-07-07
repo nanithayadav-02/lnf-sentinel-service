@@ -30,8 +30,6 @@ class TenantServiceTest {
     @InjectMocks
     private TenantService tenantService;
 
-
-
     @Test
     void shouldCreateTenantSuccessfully() {
 
@@ -132,4 +130,5 @@ class TenantServiceTest {
 
         verify(tenantRepository).findById(id);
     }
+
 }

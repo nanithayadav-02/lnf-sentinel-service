@@ -57,4 +57,5 @@ public class IssueStatusHistoryService {
                 .map(IssueStatusHistoryConverter::toDto)
                 .collect(Collectors.toList());
     }
+
 }

@@ -8,11 +8,13 @@ import com.lnf.sentinel.converter.IssueConverter;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.IssueStatusHistory;
 import com.lnf.sentinel.model.Tenant;
-import com.lnf.sentinel.model.enums.*;
+import com.lnf.sentinel.model.enums.IssueStatus;
+import com.lnf.sentinel.model.enums.Severity;
 import com.lnf.sentinel.repository.IssueRepository;
 import com.lnf.sentinel.repository.IssueStatusHistoryRepository;
 import com.lnf.sentinel.repository.TenantRepository;
 import com.lnf.sentinel.tenant.TenantFilterResolver;
+import com.lnf.sentinel.util.JwtTokenUtil;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +35,13 @@ import static com.lnf.sentinel.service.IssueSpecifications.*;
 @Slf4j
 public class IssueService {
 
-    private static final String KEY_PREFIX = "PRD-";
+    private static final String KEY_PREFIX = "ISSUE-";
     private final IssueRepository issueRepository;
     private final IssueStatusHistoryRepository historyRepository;
     private final TenantRepository tenantRepository;
     private final TenantFilterResolver tenantFilterResolver;
+    private final IssueWatcherService issueWatcherService;
+    private final JwtTokenUtil sentinelUtil;
     @Value("${lnf.tenant.enabled}")
     private boolean tenantEnabled;
 
@@ -55,52 +59,28 @@ public class IssueService {
 
     @Transactional
     public void create(IssueDto resource) {
-
         resolveTenant(resource);
-        if (resource.getTenantId() == null) {
-            throw new LnFException("Tenant Id is required");
+        long seq = issueRepository.nextIssueKeyNumber();
+        resource.setIssueKey(KEY_PREFIX + seq);
+        Issue updatedEntity = IssueConverter.toEntityModel(resource, new Issue());
+        Issue entity = issueRepository.save(updatedEntity);
+        if (resource.isWatcher()) {
+            String userEmail = sentinelUtil.getUserEmail();
+            String userName = sentinelUtil.getUserName();
+            issueWatcherService.addWatcher(entity.getId(), userEmail, userName);
         }
-
-        Issue issue = new Issue();
-        Long seq = issueRepository.nextIssueKeyNumber();
-        issue.setIssueKey("ISSUE-" + seq);
-        issue.setSummary(resource.getSummary());
-        issue.setDescription(resource.getDescription());
-        issue.setTenantId(resource.getTenantId());
-        issue.setTenantName(resource.getTenantName());
-        issue.setAssigneeId(resource.getAssigneeId());
-        issue.setAssignee(resource.getAssignee());
-        issue.setReportedBy(resource.getReportedBy());
-        issue.setAffectedService(resource.getAffectedService());
-        issue.setSeverity(Severity.valueOf(resource.getSeverity()));
-        issue.setPriority(Priority.valueOf(resource.getPriority()));
-        issue.setCategory(Category.valueOf(resource.getCategory()));
-        issue.setEnvironment(Environment.valueOf(resource.getEnvironment()));
-        issue.setStatus(IssueStatus.valueOf(resource.getStatus()));
-        issue.setDetectedAt(resource.getDetectedAt());
-        issue.setSlaDueAt(resource.getSlaDueAt());
-        Issue saved = issueRepository.saveAndFlush(issue);
-        log.info("Issue saved successfully. ID={}", saved.getId());
+        recordHistory(entity, entity.getStatus(), entity.getStatus(), "Issue Created");
     }
 
     private void resolveTenant(IssueDto resource) {
-
         if (tenantEnabled) {
             String tenantName = tenantFilterResolver.resolvePrefix();
-
             Tenant tenant = searchForTenantName(tenantName);
             resource.setTenantName(tenant.getName());
-            resource.setTenantId(tenant.getId());
-
-        } else {
-            if (resource.getTenantId() == null) {
-                throw new LnFException("Tenant Id is required");
-            }
         }
     }
 
     private Tenant searchForTenantName(String tenantName) {
-
         return tenantRepository.findByName(tenantName)
                 .orElseThrow(() ->
                         new LnFEntityNotFoundException(
@@ -167,6 +147,7 @@ public class IssueService {
         h.setFromStatus(from);
         h.setToStatus(to);
         h.setNotes(notes);
+        h.setChangedBy(issue.getLastUpdatedBy());
         historyRepository.save(h);
     }
 

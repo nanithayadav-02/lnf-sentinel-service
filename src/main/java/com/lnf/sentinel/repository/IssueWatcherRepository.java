@@ -10,8 +10,7 @@ import java.util.UUID;
 public interface IssueWatcherRepository extends JpaRepository<IssueWatcher, UUID> {
 
     List<IssueWatcher> findByIssueId(UUID issueId);
-    Optional<IssueWatcher> findByIssueIdAndUserId(UUID issueId, UUID userId);
-    Optional<IssueWatcher> findByIssueIdAndUserIdAndCreatedBy(UUID issueId, UUID userId,String createdBy);
-    boolean existsByIssueIdAndUserId(UUID issueId, UUID userId);
+
+    Optional<IssueWatcher> findByIssueIdAndUserEmail(UUID issueId, String userEmail);
 
 }

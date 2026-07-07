@@ -3,10 +3,6 @@ package com.lnf.sentinel.converter;
 import com.lnf.dto.sentinel.IssueCommentDto;
 import com.lnf.sentinel.model.IssueComment;
 
-import java.util.UUID;
-
-import static org.springframework.data.redis.connection.ReactiveStreamCommands.AddStreamRecord.body;
-
 public class IssueCommentConverter {
 
     private IssueCommentConverter() {
@@ -18,20 +14,18 @@ public class IssueCommentConverter {
         return IssueCommentDto.builder()
                 .id(entity.getId())
                 .issueId(entity.getIssueId())
-                .userId(entity.getUserId())
-                .authorId(entity.getAuthorId())
+                .userName(entity.getUserName())
+                .userEmail(entity.getUserEmail())
                 .body(entity.getBody())
-                .internal(entity.isInternal())
                 .build();
     }
 
     public static IssueComment toEntityModel(IssueComment entity, IssueCommentDto transport) {
         if (entity == null || transport == null) return null;
         entity.setIssueId(transport.getIssueId());
-        entity.setUserId(transport.getUserId());
+        entity.setUserName(transport.getUserName());
         entity.setBody(transport.getBody());
-        entity.setAuthorId(transport.getAuthorId());
-        entity.setInternal(transport.isInternal());
+        entity.setUserEmail(transport.getUserEmail());
         return entity;
     }
 

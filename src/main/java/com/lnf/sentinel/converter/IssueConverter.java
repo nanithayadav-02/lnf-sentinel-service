@@ -3,8 +3,7 @@ package com.lnf.sentinel.converter;
 import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.enums.*;
-
-import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 
 public class IssueConverter {
 
@@ -20,9 +19,8 @@ public class IssueConverter {
         return IssueDto.builder()
                 .id(entity.getId())
                 .issueKey(entity.getIssueKey())
-                .summary(entity.getSummary())
+                .title(entity.getTitle())
                 .description(entity.getDescription())
-                .tenantId(entity.getTenantId())
                 .rootCause(entity.getRootCause())
                 .tenantName(entity.getTenantName())
                 .status(entity.getStatus() != null ? entity.getStatus().name() : null)
@@ -30,13 +28,12 @@ public class IssueConverter {
                 .priority(entity.getPriority() != null ? entity.getPriority().name() : null)
                 .category(entity.getCategory() != null ? entity.getCategory().name() : null)
                 .environment(entity.getEnvironment() != null ? entity.getEnvironment().name() : null)
-                .assigneeId(entity.getAssigneeId())
-                .assignee(entity.getAssignee())
-                .reportedBy(entity.getReportedBy())
+                .assigneeUserName(entity.getAssigneeUserName())
+                .assigneeEmail(entity.getAssigneeEmail())
                 .affectedService(entity.getAffectedService())
                 .resolution(
                         entity.getResolution() != null
-                                ? entity.getResolution().name()
+                                ? entity.getResolution()
                                 : null
                 )
                 .detectedAt(entity.getDetectedAt())
@@ -53,12 +50,9 @@ public class IssueConverter {
         }
 
         issue.setIssueKey(transport.getIssueKey());
-        issue.setSummary(transport.getSummary());
+        issue.setTitle(transport.getTitle());
         issue.setDescription(transport.getDescription());
         issue.setRootCause(transport.getRootCause());
-        if (transport.getTenantId() != null) {
-            issue.setTenantId(transport.getTenantId());
-        }
         issue.setTenantName(transport.getTenantName());
 
         if (transport.getStatus() != null) {
@@ -77,19 +71,19 @@ public class IssueConverter {
         if (transport.getEnvironment() != null) {
             issue.setEnvironment(Environment.valueOf(transport.getEnvironment()));
         }
-        issue.setAssigneeId(transport.getAssigneeId());
-        issue.setAssignee(transport.getAssignee());
-        issue.setReportedBy(transport.getReportedBy());
+        issue.setAssigneeUserName(transport.getAssigneeUserName());
+        issue.setAssigneeEmail(transport.getAssigneeEmail());
         issue.setAffectedService(transport.getAffectedService());
 
-        if (transport.getResolution() != null) {
-            issue.setResolution(Resolution.valueOf(transport.getResolution()));
+        if (StringUtils.isNotBlank(transport.getResolution())) {
+            issue.setResolution(transport.getResolution());
+            issue.setResolvedAt(transport.getResolvedAt());
         }
 
         issue.setDetectedAt(transport.getDetectedAt());
         issue.setSlaDueAt(transport.getSlaDueAt());
-        issue.setResolvedAt(transport.getResolvedAt());
 
         return issue;
     }
+
 }

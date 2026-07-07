@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +73,7 @@ public class TenantService {
     }
 
     public Map<String, Object> getIssuesforEachTenant() {
-        List<Object[]> result=tenantRepository.findIssuesByTennat();
+        List<Object[]> result=tenantRepository.findIssuesByTenant();
         List<Map<String,Object>> data=new ArrayList<>();
 
         for(Object[] row:result){

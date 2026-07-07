@@ -1,13 +1,13 @@
 package com.lnf.sentinel.model;
 
 import com.lnf.model.AuditableEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -20,10 +20,10 @@ public class IssueWatcher extends AuditableEntity {
     @Column(name = "issue_id", nullable = false)
     private UUID issueId;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @Column(name = "user_name")
+    private String userName;
 
-    @Column(name = "created_by")
-    private String createdBy;
+    @Column(name = "user_email")
+    private String userEmail;
 
 }

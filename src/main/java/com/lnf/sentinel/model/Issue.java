@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "issues")
@@ -18,58 +17,50 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Issue extends AuditableEntity {
 
-    @Column(name = "issue_key", nullable = false, unique = true, length = 20)
+    @Column(name = "issue_key", nullable = false, unique = true)
     private String issueKey;
 
-    @Column(name = "summary", nullable = false)
-    private String summary;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     private String description;
-
-    @Column(name = "tenant_id")
-    private UUID tenantId;
 
     @Column(name = "tenant_name")
     private String tenantName;
 
-    @Column(name="root_cause")
+    @Column(name = "root_cause")
     private String rootCause;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private IssueStatus status = IssueStatus.NEW;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private Severity severity = Severity.S3_MEDIUM;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false)
     private Priority priority = Priority.P3;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private Category category = Category.BUG;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private Environment environment = Environment.PRODUCTION;
 
-    @Column(name = "assignee_id")
-    private UUID assigneeId;
+    @Column(name = "assignee_user_name")
+    private String assigneeUserName;
 
-    @Column(name = "assignee_name")
-    private String assignee;
+    @Column(name = "assignee_email")
+    private String assigneeEmail;
 
-    @Column(name = "affected_service", length = 120)
+    @Column(name = "affected_service")
     private String affectedService;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private Resolution resolution;
-
-    @Column(name = "reported_by")
-    private String  reportedBy;
+    private String resolution;
 
     @Column(name = "detected_at")
     private Date detectedAt;
