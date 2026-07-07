@@ -1,20 +1,24 @@
 package com.lnf.sentinel.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lnf.dto.sentinel.IssueAuditHistoryDto;
 import com.lnf.exception.LnFEntityNotFoundException;
-import com.lnf.sentinel.converter.IssueAuditHistoryConverter;
+//import com.lnf.sentinel.converter.IssueAuditHistoryConverter;
 import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.IssueAuditHistory;
 import com.lnf.sentinel.repository.IssueAuditHistoryRepository;
 import com.lnf.sentinel.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,46 +27,97 @@ public class IssueAuditHistoryService {
 
     private final IssueAuditHistoryRepository issueAuditHistoryRepository;
     private final IssueRepository issueRepository;
+    private final ObjectMapper objectMapper;
 
-    public void create(IssueAuditHistoryDto resource, UUID issueId) {
+    /*
+        public void create(IssueAuditHistoryDto resource, UUID issueId) {
 
-        Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() -> new LnFEntityNotFoundException(
-                        "Issue not found : " + issueId));
+            Issue issue = issueRepository.findById(issueId)
+                    .orElseThrow(() -> new LnFEntityNotFoundException(
+                            "Issue not found : " + issueId));
 
-        IssueAuditHistory entity = new IssueAuditHistory();
+            IssueAuditHistory entity = new IssueAuditHistory();
 
-        entity.setComment(resource.getComment());
+            entity.setComment(resource.getComment());
 
-        // Better to take the issue code from the Issue entity
-        entity.setIssueCode(issue.getIssueKey());
+            // Better to take the issue code from the Issue entity
+            entity.setIssueCode(issue.getIssueKey());
 
-        entity.setIssue(issue);
+            entity.setIssue(issue);
 
-        issueAuditHistoryRepository.save(entity);
+            issueAuditHistoryRepository.save(entity);
 
-        log.info("Issue Audit History created successfully.");
+            log.info("Issue Audit History created successfully.");
+        }
+
+        @Transactional(readOnly = true)
+        public IssueAuditHistoryDto findById(UUID id) {
+
+            IssueAuditHistory entity = issueAuditHistoryRepository.findById(id)
+                    .orElseThrow(() ->
+                            new LnFEntityNotFoundException(
+                                    "Issue Audit History not found : " + id));
+
+            return IssueAuditHistoryConverter.toDto(entity);
+        }
+
+        @Transactional(readOnly = true)
+        public List<IssueAuditHistoryDto> findAll() {
+
+            return issueAuditHistoryRepository.findAll()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .map(IssueAuditHistoryConverter::toDto)
+                    .toList();
+        }*/
+    @Transactional
+    public void log(String module,
+                    String action,
+                    UUID entityId,
+                    String details,
+                    Object payload) {
+
+        IssueAuditHistory audit = new IssueAuditHistory();
+
+        audit.setId(UUID.randomUUID());
+        audit.setModule(module);
+        audit.setAction(action);
+        audit.setEntityId(entityId);
+
+        // Get logged-in user from Keycloak
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String username = "SYSTEM";
+
+        if (authentication != null &&
+                authentication.getPrincipal() instanceof Jwt jwt) {
+
+            username = jwt.getClaimAsString("preferred_username");
+        }
+
+        audit.setPerformedBy(username);
+
+        audit.setDetails(details);
+
+        audit.setInputPayload(objectMapper.valueToTree(payload));
+
+        issueAuditHistoryRepository.save(audit);
     }
 
-    @Transactional(readOnly = true)
-    public IssueAuditHistoryDto findById(UUID id) {
+    public List<Map<String, Object>> getIssueAuditHistory() {
 
-        IssueAuditHistory entity = issueAuditHistoryRepository.findById(id)
-                .orElseThrow(() ->
-                        new LnFEntityNotFoundException(
-                                "Issue Audit History not found : " + id));
+        List<Object[]> list = issueAuditHistoryRepository.findIssueAuditHistory();
+        return list.stream().filter(Objects::nonNull).map(values ->{
 
-        return IssueAuditHistoryConverter.toDto(entity);
-    }
-
-    @Transactional(readOnly = true)
-    public List<IssueAuditHistoryDto> findAll() {
-
-        return issueAuditHistoryRepository.findAll()
-                .stream()
-                .filter(Objects::nonNull)
-                .map(IssueAuditHistoryConverter::toDto)
-                .toList();
+            Map<String, Object> map = new HashMap<>();
+            map.put("IssueId", values[0]);
+            map.put("IssueKey", values[1]);
+            map.put("Action", values[2]);
+            map.put("Details", values[3]);
+            map.put("CreatedTime", values[4]);
+            return map;
+        }).toList();
     }
 
 }

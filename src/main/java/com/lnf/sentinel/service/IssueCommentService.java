@@ -3,6 +3,7 @@ package com.lnf.sentinel.service;
 import com.lnf.dto.sentinel.IssueCommentDto;
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.sentinel.converter.IssueCommentConverter;
+import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.IssueComment;
 import com.lnf.sentinel.repository.IssueCommentRepository;
 import com.lnf.sentinel.repository.IssueRepository;

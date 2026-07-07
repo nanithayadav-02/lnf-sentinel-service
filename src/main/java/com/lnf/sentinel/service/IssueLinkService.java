@@ -25,6 +25,7 @@ public class IssueLinkService {
 
     private final IssueLinkRepository repository;
     private final IssueRepository issueRepository;
+    private final IssueAuditHistoryService issueAuditHistoryService;
 
     @Transactional
     public void createLink(UUID sourceIssueId, IssueLinkDto resource) {
@@ -52,6 +53,14 @@ public class IssueLinkService {
         entity.setSourceIssueId(sourceIssueId);
 
         repository.save(entity);   // <-- MISSING LINE
+
+        issueAuditHistoryService.log(
+                "ISSUE",
+                "CREATE",
+                entity.getId(),
+                "Issue Audit History created successfully"+resource.getCreatedBy(),
+                resource
+        );
     }
 
     @Transactional(readOnly = true)
@@ -76,6 +85,13 @@ public class IssueLinkService {
         IssueLink link = repository.findById(linkId)
                 .orElseThrow(() -> new LnFEntityNotFoundException("Link not found: " + linkId));
         repository.delete(link);
+        issueAuditHistoryService.log(
+                "ISSUE-Link",
+                "Delete",
+                link.getId(),
+                "Issue Link Deleted"+link.getCreatedBy(),
+                link
+        );
     }
 
     private void searchForIssueId(UUID id) {
