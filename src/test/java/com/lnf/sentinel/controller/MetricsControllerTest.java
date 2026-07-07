@@ -35,7 +35,7 @@ class MetricsControllerTest {
         MetricSummaryDto dto = new MetricSummaryDto();
 
 
-        when(metricsService.summary(UUID.randomUUID())).thenReturn(dto);
+        when(metricsService.summary("lnf")).thenReturn(dto);
 
         mockMvc.perform(get("/lnf/sentinel/issues/metrics/summary"))
                 .andExpect(status().isOk());

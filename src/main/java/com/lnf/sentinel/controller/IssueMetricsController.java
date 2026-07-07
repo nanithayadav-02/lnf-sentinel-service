@@ -15,14 +15,13 @@ import java.util.UUID;
 @RequestMapping("/lnf/sentinel/issues/metrics")
 @RequiredArgsConstructor
 @Tag(name = "Metrics", description = "Dashboard headline n" + "umbers")
-public class MetricsController {
+public class IssueMetricsController {
 
     private final MetricsService metricsService;
 
     @GetMapping("/summary")
-    public MetricSummaryDto summary(
-            @RequestParam(required = false) UUID tenantId) {
-           return metricsService.summary(tenantId);
+    public MetricSummaryDto summary(@RequestParam(required = false) String tenantName) {
+        return metricsService.summary(tenantName);
     }
-}
 
+}
