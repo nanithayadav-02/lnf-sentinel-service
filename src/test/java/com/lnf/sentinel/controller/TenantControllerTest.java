@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +51,7 @@ class TenantControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].tenantCode").value("TENANT001"));
     }
+
     @Test
     void shouldCreateTenant() throws Exception {
 
@@ -65,8 +68,6 @@ class TenantControllerTest {
     }
 
 
-
-
     @Test
     void shouldReturnTenantById() throws Exception {
 
@@ -80,4 +81,5 @@ class TenantControllerTest {
         mockMvc.perform(get("/sentinel/tenant/" + id))
                 .andExpect(status().isOk());
     }
+
 }
