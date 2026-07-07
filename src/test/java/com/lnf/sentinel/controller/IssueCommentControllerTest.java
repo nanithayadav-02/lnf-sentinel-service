@@ -86,4 +86,5 @@ public class IssueCommentControllerTest extends BaseTestClass {
             throw new RuntimeException(e);
         }
     }
+
 }

@@ -28,7 +28,7 @@ public interface IssueRepository extends JpaRepository<Issue, UUID>, JpaSpecific
             " UNION ALL " +
             "SELECT v.status, COUNT(i.status) " +
             "FROM (VALUES ('IN_PROGRESS'), ('AWAITING_TENANT'), ('RESOLVED')) AS v(status) " +
-            "LEFT JOIN issues i ON i.status = v.status AND (:tenantId IS NULL OR i.tenant_name = :tenantName) " +
+            "LEFT JOIN issues i ON i.status = v.status AND (:tenantName IS NULL OR i.tenant_name = :tenantName) " +
             "GROUP BY v.status",nativeQuery = true)
     List<Object[]> getIssueCountByseverity(@Param(value="tenantName") String tenantName);
 }
