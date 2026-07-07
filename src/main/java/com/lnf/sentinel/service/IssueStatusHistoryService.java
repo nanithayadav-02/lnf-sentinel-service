@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class IssueStatusHistoryService {
         return repository.findAll()
                 .stream()
                 .map(IssueStatusHistoryConverter::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -54,8 +55,9 @@ public class IssueStatusHistoryService {
 
         return repository.findByIssueId(issueId)
                 .stream()
+                .sorted(Comparator.comparing(IssueStatusHistory::getCreatedTime).reversed())
                 .map(IssueStatusHistoryConverter::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

@@ -31,4 +31,5 @@ public interface IssueRepository extends JpaRepository<Issue, UUID>, JpaSpecific
             "LEFT JOIN issues i ON i.status = v.status AND (:tenantName IS NULL OR i.tenant_name = :tenantName) " +
             "GROUP BY v.status",nativeQuery = true)
     List<Object[]> getIssueCountByseverity(@Param(value="tenantName") String tenantName);
+
 }
