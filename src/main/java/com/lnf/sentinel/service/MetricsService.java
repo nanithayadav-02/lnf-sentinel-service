@@ -14,9 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
-;
 
 /**
  * Dashboard headline numbers, scoped to the pinned tenant when present.
