@@ -1,7 +1,10 @@
 package com.lnf.sentinel.model;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Date;
 import java.util.UUID;
@@ -15,14 +18,23 @@ import java.util.UUID;
 @AllArgsConstructor
 public class IssueAuditHistory extends AuditableEntity {
 
-    @Column(name = "comment", nullable = false)
-    private String comment;
+    @Column(nullable = false, length = 100)
+    private String module;
 
-    @Column(name = "issue_code", nullable = false)
-    private String issueCode;
+    @Column(nullable = false, length = 50)
+    private String action;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "issue_id", nullable = false)
-    private Issue issue;
+    @Column(name = "entity_id")
+    private UUID entityId;
+
+    @Column(name = "performed_by")
+    private String performedBy;
+
+    @Column
+    private String details;
+
+    @Column(name = "input_payload")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private JsonNode inputPayload;
 
 }
