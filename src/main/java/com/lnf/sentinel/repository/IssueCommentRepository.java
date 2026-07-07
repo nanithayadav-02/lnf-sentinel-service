@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface IssueCommentRepository extends JpaRepository<IssueComment, UUID> {
 
-    @Query("select i.issueId,i.userName, i.createdTime from IssueComment i where i.issueId=:issueId")
+    @Query("select i.issueId,i.userName,i.userEmail, i.createdTime, i.body from IssueComment i where i.issueId=:issueId")
     List<Object[]> findByIssueId(@Param("issueId") UUID issueId);
 
     Optional<IssueComment> findById(UUID issueId);

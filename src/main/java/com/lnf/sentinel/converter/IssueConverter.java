@@ -49,6 +49,7 @@ public class IssueConverter {
             return null;
         }
 
+        issue.setId(transport.getId());
         issue.setIssueKey(transport.getIssueKey());
         issue.setTitle(transport.getTitle());
         issue.setDescription(transport.getDescription());

@@ -49,7 +49,7 @@ public final class IssueSpecifications {
             ors.add(cb.like(cb.lower(root.get("affectedService")), like));
             ors.add(cb.like(cb.lower(root.get("status")), like));
             ors.add(cb.like(cb.lower(root.get("severity")), like));
-            ors.add(cb.like(cb.lower(root.get("summary")), like));
+            ors.add(cb.like(cb.lower(root.get("title")), like));
             return cb.or(ors.toArray(new Predicate[0]));
         };
     }
