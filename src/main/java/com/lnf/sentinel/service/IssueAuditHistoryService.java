@@ -1,17 +1,11 @@
 package com.lnf.sentinel.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lnf.dto.sentinel.IssueAuditHistoryDto;
-import com.lnf.exception.LnFEntityNotFoundException;
-//import com.lnf.sentinel.converter.IssueAuditHistoryConverter;
-import com.lnf.sentinel.model.Issue;
 import com.lnf.sentinel.model.IssueAuditHistory;
 import com.lnf.sentinel.repository.IssueAuditHistoryRepository;
 import com.lnf.sentinel.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -29,47 +23,6 @@ public class IssueAuditHistoryService {
     private final IssueRepository issueRepository;
     private final ObjectMapper objectMapper;
 
-    /*
-        public void create(IssueAuditHistoryDto resource, UUID issueId) {
-
-            Issue issue = issueRepository.findById(issueId)
-                    .orElseThrow(() -> new LnFEntityNotFoundException(
-                            "Issue not found : " + issueId));
-
-            IssueAuditHistory entity = new IssueAuditHistory();
-
-            entity.setComment(resource.getComment());
-
-            // Better to take the issue code from the Issue entity
-            entity.setIssueCode(issue.getIssueKey());
-
-            entity.setIssue(issue);
-
-            issueAuditHistoryRepository.save(entity);
-
-            log.info("Issue Audit History created successfully.");
-        }
-
-        @Transactional(readOnly = true)
-        public IssueAuditHistoryDto findById(UUID id) {
-
-            IssueAuditHistory entity = issueAuditHistoryRepository.findById(id)
-                    .orElseThrow(() ->
-                            new LnFEntityNotFoundException(
-                                    "Issue Audit History not found : " + id));
-
-            return IssueAuditHistoryConverter.toDto(entity);
-        }
-
-        @Transactional(readOnly = true)
-        public List<IssueAuditHistoryDto> findAll() {
-
-            return issueAuditHistoryRepository.findAll()
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .map(IssueAuditHistoryConverter::toDto)
-                    .toList();
-        }*/
     @Transactional
     public void log(String module,
                     String action,
@@ -108,7 +61,7 @@ public class IssueAuditHistoryService {
     public List<Map<String, Object>> getIssueAuditHistory() {
 
         List<Object[]> list = issueAuditHistoryRepository.findIssueAuditHistory();
-        return list.stream().filter(Objects::nonNull).map(values ->{
+        return list.stream().filter(Objects::nonNull).map(values -> {
 
             Map<String, Object> map = new HashMap<>();
             map.put("IssueId", values[0]);

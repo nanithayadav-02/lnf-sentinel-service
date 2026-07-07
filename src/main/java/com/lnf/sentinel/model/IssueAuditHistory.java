@@ -18,10 +18,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class IssueAuditHistory extends AuditableEntity {
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String module;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private String action;
 
     @Column(name = "entity_id")
