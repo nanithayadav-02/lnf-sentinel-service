@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class IssueStatusHistoryService {
 
     private final IssueStatusHistoryRepository repository;
+    private final IssueAuditHistoryService issueAuditHistoryService;
 
     public IssueStatusHistoryDto create(IssueStatusHistoryDto dto) {
 

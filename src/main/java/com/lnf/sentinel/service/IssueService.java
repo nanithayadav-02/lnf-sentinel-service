@@ -42,6 +42,7 @@ public class IssueService {
     private final TenantFilterResolver tenantFilterResolver;
     private final IssueWatcherService issueWatcherService;
     private final JwtTokenUtil sentinelUtil;
+    private final IssueAuditHistoryService issueAuditHistoryService;
     @Value("${lnf.tenant.enabled}")
     private boolean tenantEnabled;
 
@@ -64,6 +65,13 @@ public class IssueService {
         resource.setIssueKey(KEY_PREFIX + seq);
         Issue updatedEntity = IssueConverter.toEntityModel(resource, new Issue());
         Issue entity = issueRepository.save(updatedEntity);
+        issueAuditHistoryService.log(
+                "ISSUE",
+                "CREATE",
+                entity.getId(),
+                "Issue created By"+entity.getAssigneeUserName(),
+                resource
+        );
         if (resource.isWatcher()) {
             String userEmail = sentinelUtil.getUserEmail();
             String userName = sentinelUtil.getUserName();
@@ -112,6 +120,13 @@ public class IssueService {
         Issue issue = searchForIssueId(id);
         Issue entity = IssueConverter.toEntityModel(resource, new Issue());
         issueRepository.save(entity);
+        issueAuditHistoryService.log(
+                "ISSUE",
+                "Update",
+                entity.getId(),
+                "Issue Updated By"+issue.getAssigneeUserName(),
+                resource
+        );
         if (!issue.getStatus().equals(entity.getStatus())) {
             recordHistory(entity, issue.getStatus(), entity.getStatus(), "IssueUpdated");
         }
@@ -126,6 +141,13 @@ public class IssueService {
         if (!from.equals(to)) {
             issue.setStatus(to);
             issueRepository.save(issue);
+            issueAuditHistoryService.log(
+                    "ISSUE",
+                    "Update",
+                    issue.getId(),
+                    "Issue Status Updated By"+issue.getAssigneeUserName(),
+                    issue
+            );
             recordHistory(issue, from, to, notes);
         }
     }
@@ -134,6 +156,13 @@ public class IssueService {
         Issue issue = searchForIssueId(issueId);
         try {
             issueRepository.delete(issue);
+            issueAuditHistoryService.log(
+                    "ISSUE",
+                    "Delete",
+                    issueId,
+                    "Issue Deleted By"+issue.getAssigneeUserName(),
+                    issue
+            );
             log.debug("Issue with Id {} successfully deleted", issueId);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to delete Issue with Id [%s]".formatted(issueId);
@@ -149,6 +178,13 @@ public class IssueService {
         h.setNotes(notes);
         h.setChangedBy(issue.getLastUpdatedBy());
         historyRepository.save(h);
+        issueAuditHistoryService.log(
+                "ISSUEStatusHistory",
+                "CREATE",
+                issue.getId(),
+                "Issue History created successfully",
+                issue
+        );
     }
 
     private Issue searchForIssueId(UUID id) {
