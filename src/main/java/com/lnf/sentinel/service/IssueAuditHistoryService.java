@@ -37,7 +37,6 @@ public class IssueAuditHistoryService {
         audit.setAction(action);
         audit.setEntityId(entityId);
 
-        // Get logged-in user from Keycloak
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
