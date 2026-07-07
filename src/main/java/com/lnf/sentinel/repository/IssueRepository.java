@@ -23,12 +23,12 @@ public interface IssueRepository extends JpaRepository<Issue, UUID>, JpaSpecific
 
     @Query(value ="SELECT s.severity,COUNT(i.severity) FROM(VALUES ('S1_CRITICAL'), ('S2_HIGH'), ('S3_MEDIUM')," +
             "('S4_LOW')) AS s(severity) " +
-            "LEFT JOIN issues i ON i.severity = s.severity AND (:tenantId IS NULL OR i.tenant_id = :tenantId) " +
+            "LEFT JOIN issues i ON i.severity = s.severity AND (:tenantName IS NULL OR i.tenant_name = :tenantName) " +
             " GROUP BY s.severity" +
             " UNION ALL " +
             "SELECT v.status, COUNT(i.status) " +
             "FROM (VALUES ('IN_PROGRESS'), ('AWAITING_TENANT'), ('RESOLVED')) AS v(status) " +
-            "LEFT JOIN issues i ON i.status = v.status AND (:tenantId IS NULL OR i.tenant_id = :tenantId) " +
+            "LEFT JOIN issues i ON i.status = v.status AND (:tenantId IS NULL OR i.tenant_name = :tenantName) " +
             "GROUP BY v.status",nativeQuery = true)
-    List<Object[]> getIssueCountByseverity(@Param(value="tenantId") UUID tenantId);
+    List<Object[]> getIssueCountByseverity(@Param(value="tenantName") String tenantName);
 }

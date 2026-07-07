@@ -156,9 +156,9 @@ public class IssueService {
                 .orElseThrow(() -> new LnFEntityNotFoundException("Issue not found: " + id));
     }
 
-    public Map<String, Object> getIssueCountBySeverity(UUID tenantId) {
+    public Map<String, Object> getIssueCountBySeverity(String tenantName) {
 
-        List<Object[]> results = issueRepository.getIssueCountByseverity(tenantId);
+        List<Object[]> results = issueRepository.getIssueCountByseverity(tenantName);
         List<Map<String, Object>> severity = new ArrayList<>();
         List<Map<String, Object>> status = new ArrayList<>();
 
@@ -186,5 +186,5 @@ public class IssueService {
         List<Issue> issue = issueRepository.findAll(spec);
         return issue.stream().map(IssueConverter::toTransportModel).toList();
     }
-}
 
+}
