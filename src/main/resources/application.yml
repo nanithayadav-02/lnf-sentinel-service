@@ -36,6 +36,15 @@ audit:
   service:
     url: "http://localhost:8081/api/v3"
 
+file:
+  service:
+    url: "http://localhost:8081/api/v3"
+
+aws:
+  s3:
+    bucket:
+      service: "http://localhost:8081/api/v3/files"
+
 lnf:
   tenant:
     enabled: ${TENANT_ENABLED:false}
