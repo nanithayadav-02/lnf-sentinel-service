@@ -71,9 +71,9 @@ public class MetricsService {
         long lastWeekDifference = Math.abs(openTotal - lastWeekCount);
 
         Trend trend;
-        if (openTotal > lastWeekCount) {
+        if (openTotal < lastWeekCount) {
             trend = Trend.DOWN;
-        } else if (openTotal < lastWeekCount) {
+        } else if (openTotal > lastWeekCount) {
             trend = Trend.UP;
         } else {
             trend = Trend.SAME;
