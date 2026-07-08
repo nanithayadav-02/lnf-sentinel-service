@@ -70,11 +70,11 @@ public class IssueLinkService {
         return entities.
                 stream().map(row ->{
                     Map<String,Object> map=new HashMap<>();
-                    map.put("target-id",row[0]);
-                    map.put("Id",row[1]);
+                    map.put("targetId",row[0]);
+                    map.put("id",row[1]);
                     map.put("rootCause",row[2]);
                     map.put("issueKey",row[3]);
-                    map.put("Summary",row[4]);
+                    map.put("summary",row[4]);
                     map.put("linkType",row[5]);
                     return map;
                         }).toList();

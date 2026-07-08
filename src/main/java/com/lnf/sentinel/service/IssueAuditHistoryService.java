@@ -63,11 +63,11 @@ public class IssueAuditHistoryService {
         return list.stream().filter(Objects::nonNull).map(values -> {
 
             Map<String, Object> map = new HashMap<>();
-            map.put("IssueId", values[0]);
-            map.put("IssueKey", values[1]);
-            map.put("Action", values[2]);
-            map.put("Details", values[3]);
-            map.put("CreatedTime", values[4]);
+            map.put("issueId", values[0]);
+            map.put("issueKey", values[1]);
+            map.put("action", values[2]);
+            map.put("details", values[3]);
+            map.put("createdTime", values[4]);
             return map;
         }).toList();
     }
