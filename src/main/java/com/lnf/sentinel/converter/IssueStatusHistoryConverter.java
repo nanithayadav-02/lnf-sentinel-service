@@ -31,8 +31,11 @@ public final class IssueStatusHistoryConverter {
                         ? entity.getToStatus().name()
                         : null
         );
-
         dto.setChangedBy(entity.getChangedBy());
+        dto.setCreatedBy(entity.getCreatedBy());
+        dto.setCreatedTime(entity.getCreatedTime());
+        dto.setLastUpdatedBy(entity.getLastUpdatedBy());
+        dto.setLastUpdatedTime(entity.getLastUpdatedTime());
 
         return dto;
     }
