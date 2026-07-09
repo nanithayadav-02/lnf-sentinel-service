@@ -60,7 +60,7 @@ public class IssueController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update mutable fields")
-    public void update(@PathVariable UUID id, @RequestBody final IssueDto resource,
+    public void update(@PathVariable UUID id, @RequestPart final IssueDto resource,
                        @RequestPart(required = false) MultipartFile[] files) {
         issueService.update(id, resource, files);
     }
