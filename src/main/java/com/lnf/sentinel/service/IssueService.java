@@ -1,6 +1,7 @@
 package com.lnf.sentinel.service;
 
 import com.lnf.dto.common.PageRequestDto;
+import com.lnf.dto.sentinel.FileDto;
 import com.lnf.dto.sentinel.IssueDto;
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.exception.LnFException;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -43,6 +45,7 @@ public class IssueService {
     private final IssueWatcherService issueWatcherService;
     private final JwtTokenUtil sentinelUtil;
     private final IssueAuditHistoryService issueAuditHistoryService;
+    private final IssueFilesService issueFilesService;
     @Value("${lnf.tenant.enabled}")
     private boolean tenantEnabled;
 
@@ -59,7 +62,7 @@ public class IssueService {
     }
 
     @Transactional
-    public void create(IssueDto resource) {
+    public void create(IssueDto resource, MultipartFile[] files) {
         resolveTenant(resource);
         long seq = issueRepository.nextIssueKeyNumber();
         resource.setIssueKey(KEY_PREFIX + seq);
@@ -69,7 +72,7 @@ public class IssueService {
                 "ISSUE",
                 "CREATE",
                 entity.getId(),
-                "Issue created By"+entity.getAssigneeUserName(),
+                "Issue created By" + entity.getAssigneeUserName(),
                 resource
         );
         if (resource.isWatcher()) {
@@ -78,6 +81,9 @@ public class IssueService {
             issueWatcherService.addWatcher(entity.getId(), userEmail, userName);
         }
         recordHistory(entity, entity.getStatus(), entity.getStatus(), "Issue Created");
+        if (files != null) {
+            issueFilesService.create(entity.getId(), files);
+        }
     }
 
     private void resolveTenant(IssueDto resource) {
@@ -112,11 +118,20 @@ public class IssueService {
 
     @Transactional(readOnly = true)
     public IssueDto findById(UUID id) {
-        return IssueConverter.toTransportModel(searchForIssueId(id));
+        return buildIssueWithFiles(id);
+    }
+
+    private IssueDto buildIssueWithFiles(UUID id) {
+        IssueDto dto = IssueConverter.toTransportModel(searchForIssueId(id));
+        if (dto != null) {
+            List<FileDto> files = issueFilesService.findByIssueId(id);
+            dto.setFiles(files);
+        }
+        return dto;
     }
 
     @Transactional
-    public void update(UUID id, IssueDto resource) {
+    public void update(UUID id, IssueDto resource, MultipartFile[] files) {
         Issue issue = searchForIssueId(id);
         Issue entity = IssueConverter.toEntityModel(resource, new Issue());
         issueRepository.save(entity);
@@ -124,11 +139,14 @@ public class IssueService {
                 "ISSUE",
                 "Update",
                 entity.getId(),
-                "Issue Updated By"+issue.getAssigneeUserName(),
+                "Issue Updated By" + issue.getAssigneeUserName(),
                 resource
         );
         if (!issue.getStatus().equals(entity.getStatus())) {
             recordHistory(entity, issue.getStatus(), entity.getStatus(), "IssueUpdated");
+        }
+        if (files != null) {
+            issueFilesService.create(entity.getId(), files);
         }
     }
 
@@ -145,9 +163,8 @@ public class IssueService {
                     "ISSUE",
                     "Update",
                     issue.getId(),
-                    "Issue Status Updated By"+issue.getAssigneeUserName(),
-                    issue
-            );
+                    "Issue Status Updated By" + issue.getAssigneeUserName(),
+                    issue);
             recordHistory(issue, from, to, notes);
         }
     }
@@ -160,10 +177,14 @@ public class IssueService {
                     "ISSUE",
                     "Delete",
                     issueId,
-                    "Issue Deleted By"+issue.getAssigneeUserName(),
+                    "Issue Deleted By" + issue.getAssigneeUserName(),
                     issue
             );
             log.debug("Issue with Id {} successfully deleted", issueId);
+            List<FileDto> files = issueFilesService.findByIssueId(issueId);
+            for (FileDto file : files) {
+                issueFilesService.deleteById(issueId, file.getName());
+            }
         } catch (RuntimeException e) {
             String errorMessage = "Failed to delete Issue with Id [%s]".formatted(issueId);
             throw new LnFException(errorMessage);

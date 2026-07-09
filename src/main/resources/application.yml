@@ -43,7 +43,8 @@ file:
 aws:
   s3:
     bucket:
-      service: "http://localhost:8081/api/v3/files"
+      service: "/lnf/files"
+      folderName: "issues"
 
 lnf:
   tenant:

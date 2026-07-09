@@ -12,10 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -44,23 +45,24 @@ public class IssueController {
         return ResponseEntity.ok(issueService.searchForIssue(search));
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create an issue (generates key, sets SLA, writes initial history)")
-    public void create(@RequestBody IssueDto resource) {
-        issueService.create(resource);
-    }
-
     @GetMapping("/{id}")
     @Operation(summary = "Get one issue (tenant-scoped)")
     public IssueDto findById(@PathVariable UUID id) {
         return issueService.findById(id);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create an issue (generates key, sets SLA, writes initial history)")
+    public void create(@RequestPart IssueDto resource, @RequestPart(required = false) MultipartFile[] files) {
+        issueService.create(resource, files);
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update mutable fields")
-    public void update(@PathVariable UUID id, @RequestBody final IssueDto resource) {
-        issueService.update(id, resource);
+    public void update(@PathVariable UUID id, @RequestBody final IssueDto resource,
+                       @RequestPart(required = false) MultipartFile[] files) {
+        issueService.update(id, resource, files);
     }
 
     @PatchMapping("/{id}/status")

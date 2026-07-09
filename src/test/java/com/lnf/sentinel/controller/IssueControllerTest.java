@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.web.servlet.MockMvc;
@@ -70,12 +71,27 @@ class IssueControllerTest extends BaseTestClass {
     }
 
     @Test
-    void testCreate() {
+    void testCreate() throws Exception {
         IssueDto issueDto = mockIssueType();
 
         String url = "/lnf/sentinel/issues";
 
-        doNothing().when(issueService).create(any(IssueDto.class));
+        MockMultipartFile file = new MockMultipartFile(
+                "files",
+                "file.txt",
+                "text/plain",
+                "file-data".getBytes()
+        );
+
+        // JSON part for EmployeeDto
+        MockMultipartFile dtoPart = new MockMultipartFile(
+                "resource",
+                "",
+                "application/json",
+                asJsonString(issueDto).getBytes()
+        );
+
+        doNothing().when(issueService).create(any(IssueDto.class), any());
 
         try {
             mockMvc.perform(MockMvcRequestBuilders.post(url)
@@ -86,7 +102,16 @@ class IssueControllerTest extends BaseTestClass {
             fail("Unexpected exception: " + e.getMessage());
         }
 
-        verify(issueService).create(any(IssueDto.class));
+        // Act & Assert
+        mockMvc.perform(MockMvcRequestBuilders.multipart(url)
+                        .file(dtoPart)
+                        .file(file)
+
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        verify(issueService, times(1)).create(any(IssueDto.class), any());
     }
 
     @Test
@@ -94,15 +119,35 @@ class IssueControllerTest extends BaseTestClass {
 
         UUID issueId = UUID.fromString("aea3d132-dbf7-4d5f-a2b1-dd570bd32b43");
         IssueDto requestDto = mockIssueType();
-        IssueDto responseDto = mockIssueType();
 
-        doNothing().when(issueService).update(issueId, requestDto);
-        mockMvc.perform(put("/lnf/sentinel/issues/{id}", issueId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(requestDto)))
+        MockMultipartFile file = new MockMultipartFile(
+                "files",
+                "file.txt",
+                "text/plain",
+                "file-data".getBytes()
+        );
+
+        MockMultipartFile dtoPart = new MockMultipartFile(
+                "resource",
+                "",
+                "application/json",
+                asJsonString(requestDto).getBytes()
+        );
+
+        doNothing().when(issueService)
+                .update(any(UUID.class), any(IssueDto.class), any());
+
+        mockMvc.perform(multipart("/lnf/sentinel/issues/{id}", issueId)
+                        .file(file)
+                        .file(dtoPart)
+                        .with(request -> {
+                            request.setMethod("PUT");   // multipart defaults to POST
+                            return request;
+                        })
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk());
 
-        verify(issueService).update(any(UUID.class), any(IssueDto.class));
+        verify(issueService).update(any(UUID.class), any(IssueDto.class), any());
     }
 
     @Test

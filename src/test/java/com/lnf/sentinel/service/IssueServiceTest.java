@@ -59,7 +59,7 @@ public class IssueServiceTest {
         savedIssue.setId(UUID.randomUUID());
 
         when(issueRepository.save(any(Issue.class))).thenReturn(savedIssue);
-        service.create(dto);
+        service.create(dto, null);
         verify(issueRepository).nextIssueKeyNumber();
         verify(issueRepository).save(any(Issue.class));
     }
@@ -133,7 +133,7 @@ public class IssueServiceTest {
         entity.setStatus(IssueStatus.AWAITING_TENANT);
         when(issueRepository.findById(uuid)).thenReturn(Optional.of(issue));
         when(issueRepository.save(any(Issue.class))).thenReturn(entity);
-        service.update(uuid, dto);
+        service.update(uuid, dto, null);
         verify(issueRepository).findById(uuid);
         verify(issueRepository).save(any(Issue.class));
 

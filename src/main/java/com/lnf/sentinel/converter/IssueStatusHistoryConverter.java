@@ -63,6 +63,4 @@ public final class IssueStatusHistoryConverter {
         return entity;
     }
 
-
-
 }
